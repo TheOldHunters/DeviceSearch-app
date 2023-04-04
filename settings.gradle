@@ -1,0 +1,3 @@
+include ':bingmaps'
+include ':app'
+rootProject.name = "DeviceSearch"

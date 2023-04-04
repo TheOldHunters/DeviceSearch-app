@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".view.ExplainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@color/main"/>
+
+    <RelativeLayout
+        android:id="@+id/home_title"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/main"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="Verify"
+            android:textColor="@color/white"
+            android:textSize="25sp" />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/home_title"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="30dp">
+
+            <EditText
+                android:id="@+id/et_pin"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="Please enter a PIN"/>
+
+            <Button
+                android:id="@+id/bt_define"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="define"
+                android:layout_marginLeft="20dp"
+                android:backgroundTint="@color/assistant"
+                />
+
+        </LinearLayout>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            >
+
+            <Button
+                android:id="@+id/bt_unlocking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Biological Validation"
+                android:backgroundTint="@color/assistant"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">DeviceSearch</string>
+
+
+    <string name="notifyTitle">Tips</string>
+    <string name="notifyMsg">Authorization is required, please authorize, location information needs to be allowed at all times</string>
+    <string name="setting">authorize</string>
+
+    <string name="cancel">cancel</string>
+    <string name="reject">reject</string>
+
+
+    <string name="send">send</string>
+    <string name="not_connected">You have not linked a device</string>
+    <string name="bt_not_enabled_leaving">Bluetooth is not available, leave the chat</string>
+    <string name="title_connecting">Connecting</string>
+    <string name="title_connected_to">Connect</string>
+    <string name="title_not_connected">Not Connect</string>
+    <string name="scanning">device searching...</string>
+    <string name="select_device">Select a friend link</string>
+    <string name="none_paired">No paired friends</string>
+    <string name="none_found">No friends found nearby</string>
+    <string name="title_paired_devices">Paired friends</string>
+    <string name="title_other_devices">Other connectable friends</string>
+    <string name="button_scan">Search friends</string>
+    <string name="connect">My friends</string>
+    <string name="discoverable">Set Visible</string>
+    <string name="back">exit</string>
+
+</resources>

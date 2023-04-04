@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/add"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Add Device" />
+    <item android:id="@+id/open"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Open Search" />
+    <item android:id="@+id/close"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Close Search" />
+    
+
+</menu>
