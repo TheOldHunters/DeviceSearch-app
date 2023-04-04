@@ -44,10 +44,7 @@ dependencies {
 
     implementation 'pub.devrel:easypermissions:3.0.0'
 
-    compile 'com.alibaba:fastjson:1.1.55.android'
-
-
-    implementation project(':bingmaps')
+    implementation files("libs/bingmaps.aar")
 
     implementation 'androidx.biometric:biometric:1.0.0-beta01'
 
