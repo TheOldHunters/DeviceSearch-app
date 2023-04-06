@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.de.search.R;
-import com.de.search.adapte.DeviceRecycleViewAdapter;
+import com.de.search.adapter.DeviceRecycleViewAdapter;
 import com.de.search.app.APP;
 import com.de.search.base.BaseActivity;
 import com.de.search.bean.DeviceBean;

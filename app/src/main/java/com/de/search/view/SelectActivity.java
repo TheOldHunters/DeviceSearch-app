@@ -1,47 +1,26 @@
 package com.de.search.view;
 
 
-import android.Manifest;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.alibaba.fastjson.JSONObject;
 import com.de.search.R;
-import com.de.search.adapte.DeviceRecycleViewAdapter;
-import com.de.search.adapte.SelectDeviceRecycleViewAdapter;
+import com.de.search.adapter.SelectDeviceRecycleViewAdapter;
 import com.de.search.app.APP;
 import com.de.search.base.BaseActivity;
 import com.de.search.bean.DeviceBean;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class SelectActivity extends BaseActivity {

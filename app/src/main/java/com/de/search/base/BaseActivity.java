@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 /**
- * activity基类
+ * base activity
  */
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {

@@ -1,35 +1,21 @@
 package com.de.search.view;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanRecord;
-import android.bluetooth.le.ScanResult;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.de.search.R;
-import com.de.search.adapte.AddDeviceRecycleViewAdapter;
-import com.de.search.adapte.DeviceRecycleViewAdapter;
+import com.de.search.adapter.AddDeviceRecycleViewAdapter;
 import com.de.search.app.APP;
 import com.de.search.base.BaseActivity;
 import com.de.search.bean.DeviceBean;

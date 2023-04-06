@@ -1,13 +1,14 @@
-package com.de.search.adapte;
+package com.de.search.adapter;
 
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.de.search.R;
@@ -18,31 +19,31 @@ import java.util.List;
 
 public class SelectDeviceRecycleViewAdapter extends RecyclerView.Adapter<SelectDeviceRecycleViewAdapter.MyHolder> {
 
-    private List<DeviceBean> mList;//数据源
+    private final List<DeviceBean> mList;//Data source
 
 
     public SelectDeviceRecycleViewAdapter(List<DeviceBean> list) {
         mList = list;
     }
 
-    //创建ViewHolder并返回，后续item布局里控件都是从ViewHolder中取出
+    //Creates a ViewHolder and returns it, and all subsequent items in the layout are retrieved from the ViewHolder
+    @NonNull
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //将我们自定义的item布局R.layout.item_one转换为View
+        //Convert our custom item layout R.layout.item_one to View
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_select_device, parent, false);
-        //将view传递给我们自定义的ViewHolder
+        //Pass the view to our custom ViewHolder
         MyHolder holder = new MyHolder(view);
-        //返回这个MyHolder实体
+        //Returns the MyHolder entity
         return holder;
     }
 
-    //通过方法提供的ViewHolder，将数据绑定到ViewHolder中
+    //Bind data to the ViewHolder through the ViewHolder provided by the method
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(MyHolder holder, int position) {
+    public void onBindViewHolder(MyHolder holder, @SuppressLint("RecyclerView") int position) {
         DeviceBean deviceBean = mList.get(position);
-
-
 
         holder.textSort.setText(position + 1 + ".");
         holder.textName.setText("name：" + deviceBean.getName() + "");
@@ -61,32 +62,23 @@ public class SelectDeviceRecycleViewAdapter extends RecyclerView.Adapter<SelectD
         }
 
 
-
         holder.checkBox.setChecked(deviceBean.isC());
 
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mList.get(position).setC(b);
-            }
-        });
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> mList.get(position).setC(b));
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.checkBox.isChecked()){
-                    holder.checkBox.setChecked(false);
-                    mList.get(position).setC(false);
-                }else {
-                    holder.checkBox.setChecked(true);
-                    mList.get(position).setC(true);
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (holder.checkBox.isChecked()){
+                holder.checkBox.setChecked(false);
+                mList.get(position).setC(false);
+            }else {
+                holder.checkBox.setChecked(true);
+                mList.get(position).setC(true);
             }
         });
 
     }
 
-    //获取数据源总的条数
+    //Gets the total number of data source bars
     @Override
     public int getItemCount() {
         return mList.size();
@@ -104,7 +96,7 @@ public class SelectDeviceRecycleViewAdapter extends RecyclerView.Adapter<SelectD
     }
 
     /**
-     * 自定义的ViewHolder
+     * A custom ViewHolder
      */
     class MyHolder extends RecyclerView.ViewHolder {
 
@@ -114,9 +106,7 @@ public class SelectDeviceRecycleViewAdapter extends RecyclerView.Adapter<SelectD
         TextView textUser;
         TextView textMessenger;
         TextView textTime;
-
         CheckBox checkBox;
-
 
         public MyHolder(View itemView) {
             super(itemView);

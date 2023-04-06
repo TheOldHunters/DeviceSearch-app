@@ -2,6 +2,7 @@ package com.de.search.app;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -27,9 +28,9 @@ public class APP extends Application {
 
     private static Context context;
 
-    public static int type = 0; // 0：蓝牙，1：wifi，2：wifip2p
-    public static int distance = 1; // 提醒距离
-    public static int bluetoothType = 1; // 0：低功耗蓝牙，1：经典蓝牙
+    public static int type = 0; // 0: Bluetooth, 1: wifi, 2: wifip2p
+    public static int distance = 1; // Reminder distance
+    public static int bluetoothType = 1; // 0: Bluetooth low power, 1: Bluetooth classic
     public static String pin = "";
 
     public static boolean isFind = false;
@@ -79,14 +80,6 @@ public class APP extends Application {
         APP.distance = distance;
     }
 
-    public static int getBluetoothType() {
-        return bluetoothType;
-    }
-
-    public static void setBluetoothType(int bluetoothType) {
-        APP.bluetoothType = bluetoothType;
-    }
-
     public static String getPin() {
         return pin;
     }
@@ -95,16 +88,7 @@ public class APP extends Application {
         APP.pin = pin;
     }
 
-    public static String getAndroidId(Context context) {
-        try {
-            return Settings.Secure.getString(context.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-
+    @SuppressLint("MissingPermission")
     public static String getBluetoothName() {
 
         return bluetoothAdapter.getName();
@@ -112,11 +96,11 @@ public class APP extends Application {
 
 
     public static Location getLastKnownLocation() {
-        //获取地理位置管理器
+        //Gets the location manager
         LocationManager mLocationManager = (LocationManager) APP.getInstance().getSystemService(LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(APP.getInstance(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(APP.getInstance(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO:去请求权限后再获取
+            // TODO:Get it after you ask for permission
             return null;
         }
         List<String> providers = mLocationManager.getProviders(true);
@@ -130,7 +114,7 @@ public class APP extends Application {
                 bestLocation = l;
             }
         }
-        // 在一些手机5.0(api21)获取为空后，采用下面去兼容获取。
+        // After some phones 5.0(api21) fetch is null, the following is used to remove compatible fetch.
         if (bestLocation==null){
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -148,10 +132,6 @@ public class APP extends Application {
 
     public static BluetoothAdapter getBluetoothAdapter() {
         return bluetoothAdapter;
-    }
-
-    public static void setBluetoothAdapter(BluetoothAdapter bluetoothAdapter) {
-        APP.bluetoothAdapter = bluetoothAdapter;
     }
 
     @Override
