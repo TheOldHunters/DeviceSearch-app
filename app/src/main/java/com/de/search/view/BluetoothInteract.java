@@ -1,5 +1,6 @@
 package com.de.search.view;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 
 import com.alibaba.fastjson.JSONObject;
@@ -65,7 +67,7 @@ public class BluetoothInteract extends BaseActivity {
     private BingMapsView bingMapsView;
     private GPSManager _GPSManager;
     private EntityLayer _gpsLayer;
-    
+
     public static final int STATE = 1;
     public static final int READ = 2;
     public static final int WRITE = 3;
@@ -76,13 +78,13 @@ public class BluetoothInteract extends BaseActivity {
     private static final int REQUEST_CONNECT_DEVICE = 1;  //请求连接设备
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int SELECT_BT = 3;
-    
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setView(R.layout.activity_bluetooth_chat);
         super.onCreate(savedInstanceState);
-        
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // 判读蓝牙打开
@@ -92,7 +94,7 @@ public class BluetoothInteract extends BaseActivity {
                 mBluetoothInteractService = new BluetoothInteractService(this, mHandler);
                 mOutStringBuffer = new StringBuffer("");
             }
-        } 
+        }
     }
 
     @Override
@@ -119,7 +121,7 @@ public class BluetoothInteract extends BaseActivity {
         toolbar.inflateMenu(R.menu.option_menu);
         //选项菜单监听
         toolbar.setOnMenuItemClickListener(new MyMenuItemClickListener());
-        
+
         // 发送需要帮忙寻找的设备给朋友
         bt1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +177,16 @@ public class BluetoothInteract extends BaseActivity {
     //修改本机蓝牙设备的可见性
     private void ensureDiscoverable() {
         //打开手机蓝牙后，能被其它蓝牙设备扫描到的时间不是永久的
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             //设置在100秒内可见（能被扫描）
@@ -256,9 +268,9 @@ public class BluetoothInteract extends BaseActivity {
                             List<DeviceBean> deviceBeans1 = JSONObject.parseArray(jsonObject.getString("data"), DeviceBean.class);
 
                             // 保存找到的设备信息
-                            for (DeviceBean deviceBean : deviceBeans1){
+                            for (DeviceBean deviceBean : deviceBeans1) {
                                 List<DeviceBean> deviceBeans3 = DeviceBean.find(DeviceBean.class, "mac = ?", deviceBean.getMac());
-                                if (deviceBeans3.size() > 0){
+                                if (deviceBeans3.size() > 0) {
                                     deviceBeans3.get(0).setRssi(deviceBean.getRssi());
                                     deviceBeans3.get(0).setFind(deviceBean.getFind());
                                     deviceBeans3.get(0).setFindTime(deviceBean.getFindTime());
@@ -276,26 +288,25 @@ public class BluetoothInteract extends BaseActivity {
                             Toast.makeText(BluetoothInteract.this, "Received the equipment sent by the other party to help find it", Toast.LENGTH_LONG).show();
 
 
-
                             break;
                         case "2":
                             // 对方发来要帮忙寻找的设备，保存到数据库
                             List<DeviceBean> deviceBeans2 = JSONObject.parseArray(jsonObject.getString("data"), DeviceBean.class);
-                            for (DeviceBean deviceBean : deviceBeans2){
+                            for (DeviceBean deviceBean : deviceBeans2) {
                                 // 查询是否已经保存过
                                 List<DeviceBean> deviceBeans3 = DeviceBean.find(DeviceBean.class, "mac = ?", deviceBean.getMac());
                                 // 保存过则不再保存
-                                if (deviceBeans3.size() == 0){
+                                if (deviceBeans3.size() == 0) {
                                     // 通过传递着的mac查询朋友自定义名称，因为在配对朋友的时候会把朋友的mac也一起保存，所以可以查到
                                     List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", deviceBean.getMessengerId());
-                                    if (friendBeans.size() > 0){
+                                    if (friendBeans.size() > 0) {
                                         // 在数据库查出设备传递者的自定义名称并设置，传递者即是当前连接者
                                         deviceBean.setMessengerName(friendBeans.get(0).getUserName());
                                     }
 
                                     // 通过拥有者的mac查询朋友自定义名称，因为在配对朋友的时候会把朋友的mac也一起保存，所以可以查到
                                     List<FriendBean> friendBeans2 = FriendBean.find(FriendBean.class, "name = ?", deviceBean.getUserId());
-                                    if (friendBeans2.size() > 0){
+                                    if (friendBeans2.size() > 0) {
                                         // 如果我在app配对过设备拥有者，则在数据库取出设备拥有者的备注名称并设置
                                         deviceBean.setUserName(friendBeans2.get(0).getUserName());
                                     }
@@ -327,7 +338,7 @@ public class BluetoothInteract extends BaseActivity {
 
                             String mac = jsonObject.getString("mac");
                             List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", mac);
-                            if (friendBeans.size() > 0){
+                            if (friendBeans.size() > 0) {
                                 friendBeans.get(0).setStatus(1);
                                 friendBeans.get(0).update();
                             }
@@ -382,8 +393,18 @@ public class BluetoothInteract extends BaseActivity {
 
 //                    List<DeviceBean> deviceBeans = Select.from(DeviceBean.class).list();
                     // 传递人全部改为自己
-                    for (int i = 0; deviceBeans.size() > i; i ++){
+                    for (int i = 0; deviceBeans.size() > i; i++) {
                         deviceBeans.get(i).setMessengerId(APP.getBluetoothName());
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
                         deviceBeans.get(i).setMessengerName(bluetoothAdapter.getName());
                     }
                     JSONObject jsonObject1 = new JSONObject();
