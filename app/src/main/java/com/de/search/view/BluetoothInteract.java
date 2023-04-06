@@ -1,5 +1,6 @@
 package com.de.search.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -198,6 +199,7 @@ public class BluetoothInteract extends BaseActivity {
 
 
     //使用Handler对象在UI主线程与子线程之间传递消息
+    @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {   //消息处理
         @Override
         public void handleMessage(Message msg) {
