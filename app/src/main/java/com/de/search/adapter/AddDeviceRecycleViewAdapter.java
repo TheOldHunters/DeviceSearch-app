@@ -14,6 +14,8 @@ import com.de.search.bean.DeviceBean;
 
 import java.util.List;
 
+//The adapter for the list, used to load the list
+
 public class AddDeviceRecycleViewAdapter extends RecyclerView.Adapter<AddDeviceRecycleViewAdapter.MyHolder> {
 
     private final List<DeviceBean> mList;//Data source

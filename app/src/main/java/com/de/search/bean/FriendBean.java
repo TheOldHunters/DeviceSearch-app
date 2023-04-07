@@ -5,14 +5,14 @@ import com.orm.SugarRecord;
 import java.io.Serializable;
 
 public class FriendBean extends SugarRecord implements Serializable {
-    private String name; // 蓝牙名称
-    private String mac;  // 蓝牙mac，如果是蓝牙朋友则用蓝牙mac，如果是p2p朋友则用蓝牙名称，因为p2p没有mac
-    private String userId = "";  // 朋友手机id，空
-    private String userName = "";  // 备注朋友名称
+    private String name; // Bluetooth name
+    private String mac;  // Bluetooth mac, Bluetooth mac if it's a Bluetooth friend, Bluetooth name if it's a p2p friend, because p2p doesn't have a mac
+    private String userId = "";  // Friend's phone id, empty
+    private String userName = "";  // Remarks Friend Name
 
-    private String type = "1"; // 朋友类型，1：蓝牙，2：p2p
+    private String type = "1"; // Friend type, 1: Bluetooth, 2: p2p
 
-    private int status = 0; // 0:未发送，1：发送过
+    private int status = 0; // 0: not sent, 1: sent
 
 
     public FriendBean() {

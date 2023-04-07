@@ -17,23 +17,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //当前activity是否位于前台
+    //Whether the current activity is in the foreground
     protected boolean isForeground = false;
-    //收到关闭activity消息时是否关闭
+    //Whether to shut down the activity when receiving the message
     protected boolean isClose = true;
 
-    // 一定要先设置布局，不然找不到控件
+    //Be sure to set the layout first, otherwise you won't find the control
     protected int layoutRes;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 一定要先onCreate，再创建页面，不然适配就会没用，因为要加载适配的东西，再加载页面自动适配；
-        // 现在如果加载页面先在加载适配，就会适配不了，因为页面已经加载完了；
+        //Must first onCreate, then create the page, otherwise the adaptation will be useless
+        //because you need to load the adaptation, then load the page automatic adaptation;
+        //Now if you load the page in the first load adaptation, will not fit, because the page has been loaded;
         super.onCreate(savedInstanceState);
         setContentView(layoutRes);
 
-        // 顶头栏透明全屏
+        //Top bar transparent full screen
         if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();
             int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
@@ -41,13 +42,9 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
-
         initView();
         initData();
         initListener();
-
-
-
 
     }
 
@@ -56,7 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     }
 
     /**
-     * 根据Id查找view
+     * Look for a view based on its Id
      *
      * @param resId
      * @param <T>
@@ -66,42 +63,38 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         return (T) super.findViewById(resId);
     }
 
-    //初始化view
+    //Initialize view
     protected abstract void initView();
 
-    //初始化数据
+    //Initialize data
     protected abstract void initData();
 
-    //初始化监听器
+    //Initialize the listener
     protected abstract void initListener();
 
-    //显示toast，默认是短时间显示
+    //Displays toast. The default is a short display
     protected void showToast(String message) {
         showToast(message, Toast.LENGTH_LONG);
     }
 
-    //显示toast
+    //Show toast
     protected void showToast(String message, int time) {
         Toast.makeText(this, message, time).show();
     }
 
 
     /**
-     * 统一跳转Activity
+     * Uniform jump Activity
      *
      * @param intent
      */
     protected void startToActivity(Intent intent) {
         startActivity(intent);
-        // 第一个参数是目标Activity进入时的动画，第二个参数是当前Activity退出时的动画
-//        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        // The first parameter is the animation of the target Activity when it enters
+        // and the second parameter is the animation of the current Activity when it exits
     }
 
-    /**
-     * 统一跳转Activity
-     *
-     * @param cls
-     */
+
     protected void startToActivity(Class cls) {
         startToActivity(new Intent(this, cls));
     }
@@ -139,9 +132,6 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     @Override
     public void finish() {
         super.finish();
-        //  overridePendingTransition(android.R.anim.slide_in_left, R.anim.activity_out);
     }
-
-
 
 }

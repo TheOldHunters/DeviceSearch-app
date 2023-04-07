@@ -7,20 +7,20 @@ import java.io.Serializable;
 public class DeviceBean extends SugarRecord implements Serializable {
     private String name;
     private String mac;
-    private String type = "0";  // 0：蓝牙设备，1：wifi设备，2：wifiP2P
-    private String btType = "0";  // 0：低功耗蓝牙，1：经典蓝牙
+    private String type = "0";  // 0: Bluetooth device, 1: wifi device, 2: wifiP2P
+    private String btType = "0";  // 0: Bluetooth low power, 1: Bluetooth classic
     private int rssi;
 
-    private int me = 0;  // 是否是自己设备   0：不是自己  1：是自己
-    private String userId = "";    // 设备拥有者Id（蓝牙名称）   添加到我的设备时会设置
-    private String userName = "";  // 设备拥有者名称（蓝牙名称/自定义名称）   添加到我的设备时会设置
-    private String messengerId = "";   // 设备传递者Id（蓝牙名称）  传递给朋友时会设置
-    private String messengerName = "";   // 设备传递者名称（蓝牙名称/自定义名称）   传递给朋友时会设置
-    private int find = 0;   // 0：没找到  1：找到
-    private String findTime = "";   // 找到到时间
-    private String longitude = "";   // 经度
-    private String latitude = "";   // 纬度
-    private String findPlace = "";   // 地点
+    private int me = 0;  // Whether it is your own device 0: It is not your own device 1: It is your own device
+    private String userId = "";    // The device owner Id (Bluetooth name) is set when added to my device
+    private String userName = "";  // Device owner name (Bluetooth name/Custom name) is set when added to my device
+    private String messengerId = "";   // The device passer Id (Bluetooth name) is set when passed to friends
+    private String messengerName = "";   // Device passer name (Bluetooth name/Custom name) is set when passed to friends
+    private int find = 0;   // 0: not found 1: found
+    private String findTime = "";   // Time when find
+    private String longitude = "";   // longitude
+    private String latitude = "";   // latitude
+    private String findPlace = "";   // location
 
     private boolean c;
 
