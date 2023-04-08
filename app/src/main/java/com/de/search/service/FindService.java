@@ -1,29 +1,17 @@
 package com.de.search.service;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanSettings;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.AudioAttributes;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.os.Binder;
-import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.Vibrator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -34,14 +22,12 @@ import androidx.core.app.NotificationCompat;
 import com.de.search.R;
 import com.de.search.app.APP;
 import com.de.search.view.FindActivity;
-import com.inuker.bluetooth.library.beacon.Beacon;
 import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 
-import java.util.ArrayList;
-import java.util.List;
+//This is the core code of Bluetooth search function of this app, which realizes dual-mode ble and bt search function by importing inuker bluetooth library
 
 public class FindService extends Service {
 
@@ -60,11 +46,11 @@ public class FindService extends Service {
     private NotificationManager notificationManager;
     private Notification notification;
 
-    // 是否找到
+    // Whether to find it
     private boolean find;
-    // 蓝牙
+    // bluetooth
     private SearchRequest searchRequest;
-    // 蓝牙开关
+    // Bluetooth switch
     private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
         @Override
         public void onBluetoothStateChanged(boolean openOrClosed) {
@@ -76,25 +62,22 @@ public class FindService extends Service {
     };
 
 
-
-
-
     private int i = 0;
 
 
     /**
-     * 创建Binder对象，返回给客户端即Activity使用，提供数据交换的接口
+     * Create a Binder object that is returned to the client and used by the Activity to provide an interface for data exchange
      */
     public class FindBinder extends Binder {
-        // 声明一个方法，getService。（提供给客户端调用）
+        // Declare a method: getService.(Provided to client call)
         FindService getService() {
-            // 返回当前对象LocalService,这样我们就可在客户端端调用Service的公共方法了
+            // Returns the current object -- LocalService, so we can call the public method of Service on the client side
             return FindService.this;
         }
     }
 
     /**
-     * 把Binder类返回给客户端
+     * Return the Binder class to the client
      */
     @Nullable
     @Override
@@ -104,8 +87,8 @@ public class FindService extends Service {
 
 
     /**
-     * 首次创建服务时，系统将调用此方法来执行一次性设置程序（在调用 onStartCommand() 或 onBind() 之前）。
-     * 如果服务已在运行，则不会调用此方法。该方法只被调用一次
+     * When the service is first created, the system calls this method to perform a one-time setup routine (before calling onStartCommand() or onBind()).
+     * This method is not called if the service is already running. This method is called only once
      */
     @Override
     public void onCreate() {
@@ -113,7 +96,7 @@ public class FindService extends Service {
         APP.isFind = true;
         audioAttributes = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_ALARM) // 源码中isAlarm判断可通过
+                .setUsage(AudioAttributes.USAGE_ALARM) // isAlarm judgment in the source code can be passed
                 .build();
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -123,7 +106,7 @@ public class FindService extends Service {
     }
 
     /**
-     * 每次通过startService()方法启动Service时都会被回调。
+     * The Service is called back each time it is started through the startService() method.
      *
      * @param intent
      * @param flags
@@ -153,7 +136,7 @@ public class FindService extends Service {
     }
 
     /**
-     * 服务销毁时的回调
+     * The callback when the service is destroyed
      */
     @Override
     public void onDestroy() {
@@ -175,8 +158,7 @@ public class FindService extends Service {
     }
 
 
-
-    // 扫描蓝牙
+    // Scanning bluetooth
     public void scan() {
         if (!APP.isFind) {
             return;
@@ -189,16 +171,14 @@ public class FindService extends Service {
 
         find = false;
 
-
-
         i += 1;
         sendData2(String.valueOf(i));
         Log.e("tvNum", "" + i);
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(5000, 1) // 先扫 BLE 设备 1 次，每次 5s
-                    .searchBluetoothClassicDevice(5000) // 再扫经典蓝牙 5s
+                    .searchBluetoothLeDevice(5000, 1) // Scan the BLE device once for 5s each time
+                    .searchBluetoothClassicDevice(5000) // Then scan the classic Bluetooth 5s
                     .build();
         }
         APP.mClient.search(searchRequest, new SearchResponse() {
@@ -207,6 +187,7 @@ public class FindService extends Service {
                 find = false;
             }
 
+            @SuppressLint("MissingPermission")
             @Override
             public void onDeviceFounded(SearchResult device) {
                 if (find){
@@ -214,12 +195,12 @@ public class FindService extends Service {
                 }
 
                 BluetoothDevice bluetoothDevice = device.device;
-                if (TextUtils.isEmpty(bluetoothDevice.getName()) || bluetoothDevice.getName().equals("NULL") || device.rssi == 0 || TextUtils.isEmpty(bluetoothDevice.getAddress())) {   //加入到list中
+                if (TextUtils.isEmpty(bluetoothDevice.getName()) || bluetoothDevice.getName().equals("NULL") || device.rssi == 0 || TextUtils.isEmpty(bluetoothDevice.getAddress())) {   //Add it to the list
                     return;
                 }
 
                 if (bluetoothDevice.getAddress().equals(mac)) {
-                    float d = (float) Math.pow(10, ((Math.abs(device.rssi) - 60) / (10 * 2.0f)));
+                    float d = (float) Math.pow(10, ((Math.abs(device.rssi) - 60) / (10 * 2.0f))); //rssi distance function
                     int i = (int) (d * 100);
                     d = (float) i / 100;
 
@@ -227,8 +208,8 @@ public class FindService extends Service {
 //                    scan();
                     find = true;
 
-                    Log.e("", "找到了");
-                    Log.e("getRssi", String.valueOf(device.rssi));
+                    Log.e("", "find it");
+                    Log.e("getRssi", String.valueOf(device.rssi)); //record rssi value
                 }
             }
 
@@ -237,11 +218,11 @@ public class FindService extends Service {
                 Log.e("onSearchStopped","onSearchStopped");
 
                 if (!find){
-                    // 没找到
+                    // not find it
                     sendData1("", "", "not detected");
                 }
 
-                // 循环扫
+                // Loop of scanning
                 scan();
 
             }
@@ -299,12 +280,12 @@ public class FindService extends Service {
         sendBroadcast(intentBroadcastReceiver);
     }
 
-    // 创建通知栏
+    // Create notification bar
     public void createMusicNotification(Context context) {
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        //android 8.0的判断、需要加入NotificationChannel
+        //For android 8.0, the NotificationChannel needs to be added
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("qqq", "qqq",
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -312,24 +293,19 @@ public class FindService extends Service {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "qqq");
-        //自定义布局必须加上、否则布局会有显示问题、可以自己try try
+
         builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setOngoing(true);//代表是常驻的，主要是配合服务
+        builder.setOngoing(true);//resident
 
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.item_notice);
 
         remoteViews.setTextViewText(R.id.tv_name, "name：" + name);
         remoteViews.setTextViewText(R.id.tv_mac, "mac：" + mac);
 
-        //自定义点击事件、会在Service. onStartCommand中回调
-//        Intent stopIntent = new Intent(context, MediaService.class);
-//        stopIntent.setAction(STOP_PLAY_SERVICE);
-//
-//        PendingIntent startOrPauseP = PendingIntent.getService(context, MediaService.RELEASE, stopIntent, 0);
-//        remoteViews.setOnClickPendingIntent(R.id.ivStop, startOrPauseP);
+
         builder.setContent(remoteViews);
         notification = builder.build();
-        //0x11 为通知id 自定义可
+        //0x11 is the notification id
         notificationManager.notify(0x11, notification);
 
     }

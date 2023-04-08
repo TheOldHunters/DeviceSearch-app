@@ -18,7 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-// 这个类是两台手机之间的蓝牙通讯，连接，收发信息，参考下面这个地址的开源代码
+// This class is the Bluetooth communication between two mobile phones' connection, sending and receiving information
+// Some ideas are referred from 'ChatService' in the open source project below, but it was redesigned for this app
 // https://gitee.com/liu_peilin/bluetooth-communication
 
 public class BluetoothInteractService {
@@ -34,7 +35,8 @@ public class BluetoothInteractService {
     private int mState;
 
 
-    // 创建监听线程，准备接受新连接。使用阻塞方式，调用 BluetoothServerSocket.accept()
+    // Create a listening thread ready to accept a new connection by using blocking mode
+    // calling BluetoothServerSocket.accept()
     private class ReceiveThread extends Thread {
         private final BluetoothServerSocket mmServerSocket;
 
@@ -42,7 +44,7 @@ public class BluetoothInteractService {
         public ReceiveThread() {
             BluetoothServerSocket tmp = null;
             try {
-                //使用射频端口（RF comm）监听
+                //Use RF comm to listen
                 tmp = APP.getBluetoothAdapter().listenUsingRfcommWithServiceRecord("BluetoothInteract", UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66"));
             } catch (IOException e) {
             }
@@ -89,10 +91,10 @@ public class BluetoothInteractService {
     }
 
     /*
-        连接线程，专门用来对外发出连接对方蓝牙的请求和处理流程。
-        构造函数里通过 BluetoothDevice.createRfcommSocketToServiceRecord() ，
-        从待连接的 device 产生 BluetoothSocket. 然后在 run 方法中 connect ，
-        成功后调用 BluetoothChatSevice 的 connected() 方法。定义 cancel() 在关闭线程时能够关闭相关socket 。
+        The connection thread is used to send requests and processes to connect to the other party's Bluetooth.
+        Constructor by BluetoothDevice.createRfcommSocketToServiceRecord() ，
+        Generate BluetoothSocket from the device to be connected. And then connect in the run method,
+        BluetoothChatSevice's connected() method is called upon success. Define cancel() to close the socket in question when the thread is closed.
      */
     private class ConnectionThread extends Thread {
         private final BluetoothSocket socket;
@@ -142,9 +144,10 @@ public class BluetoothInteractService {
     }
 
     /*
-        双方蓝牙连接后一直运行的线程；构造函数中设置输入输出流。
-        run()方法中使用阻塞模式的 InputStream.read()循环读取输入流，然后发送到 UI 线程中更新聊天消息。
-        本线程也提供了 write() 将聊天消息写入输出流传输至对方，传输成功后回写入 UI 线程。最后使用cancel()关闭连接的 socket
+        The thread that runs continuously after the two sides are connected by Bluetooth; Constructor to set the input/output stream.
+        The InputStream.read() loop in the run() method uses blocking mode to read the input stream and then sends it to the UI thread to update the chat message.
+        This thread also provides write() to write the chat message to the other party and write it back to the UI thread after successful transmission.
+        Finally, close the connected socket with cancel()
      */
     private class TransceiverThread extends Thread {
         private final BluetoothSocket bluetoothSocket;
@@ -201,9 +204,9 @@ public class BluetoothInteractService {
         }
     }
 
-    //构造方法，接收UI主线程传递的对象
+    //Constructor that receives the object passed by the UI main thread
     public BluetoothInteractService(Context context, Handler handler) {
-        //构造方法完成蓝牙对象的创建
+        //Constructor completes the creation of the Bluetooth object
         mState = NONE;
         mHandler = handler;
     }
@@ -225,7 +228,7 @@ public class BluetoothInteractService {
         setState(LISTEN);
     }
 
-    //取消 CONNECTING 和 CONNECTED 状态下的相关线程，然后运行新的 mConnectThread 线程
+    //Cancel the related threads in the CONNECTING and CONNECTED states and run the new mConnectThread thread
     public synchronized void onConnect(BluetoothDevice device) {
         if (mState == CONNECTING) {
             if (mConnectThread != null) {
@@ -243,9 +246,9 @@ public class BluetoothInteractService {
     }
 
     /*
-        开启一个 ConnectedThread 来管理对应的当前连接。之前先取消任意现存的 mConnectThread 、
-        mConnectedThread 、 mAcceptThread 线程，然后开启新 mConnectedThread ，传入当前刚刚接受的
-        socket 连接。最后通过 Handler来通知UI连接
+        Open a ConnectedThread to manage the current connection. Cancel any existing mConnectThreads before doing so;
+        mConnectedThread, mAcceptThread threads;Then open the new mConnectedThread, passing in the one you just accepted
+        socket connection. Finally, the UI connection is notified via Handler
      */
     @SuppressLint("MissingPermission")
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
@@ -263,7 +266,7 @@ public class BluetoothInteractService {
     }
 
 
-    // 停止所有相关线程，设当前状态为 NONE
+    // Stop all associated threads, setting the current state to NONE
     public synchronized void stopThread() {
         destroy();
         setState(NONE);
@@ -287,7 +290,7 @@ public class BluetoothInteractService {
 
 
 
-    // 当连接失去的时候，设为 LISTEN 状态并通知 ui
+    // When the connection is lost, set it to the LISTEN state and notify the ui
     private void onConnectionLost() {
         setState(LISTEN);
         Message msg = mHandler.obtainMessage(BluetoothInteract.MESSAGE_TOAST);
@@ -298,7 +301,7 @@ public class BluetoothInteractService {
     }
 
 
-    // 连接失败的时候处理，通知 ui ，并设为 LISTEN 状态
+    // When the connection fails, it handles it, notifies the ui, and sets the state to LISTEN
     private void onConnectionFailed() {
         setState(LISTEN);
         Message msg = mHandler.obtainMessage(BluetoothInteract.MESSAGE_TOAST);
@@ -319,7 +322,7 @@ public class BluetoothInteractService {
     }
 
 
-    // 在 CONNECTED 状态下，调用 mConnectedThread 里的 write 方法，写入 byte
+    // In the CONNECTED state, call the write method in mConnectedThread and write to byte
     public void writeData(byte[] out) {
         synchronized (this) {
             if (mState != CONNECTED)
