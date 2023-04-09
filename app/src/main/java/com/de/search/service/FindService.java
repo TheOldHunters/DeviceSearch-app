@@ -27,7 +27,8 @@ import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 
-//This is the core code of Bluetooth search function of this app, which realizes dual-mode ble and bt search function by importing inuker bluetooth library
+//This is the core code of Bluetooth search function of this app, which realizes dual-mode ble and bt search function by importing inuker bluetoothkit library
+//https://github.com/dingjikerbo/Android-BluetoothKit
 
 public class FindService extends Service {
 

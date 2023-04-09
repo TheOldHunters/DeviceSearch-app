@@ -1,6 +1,7 @@
 package com.de.search.util;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -18,64 +19,53 @@ import com.de.search.R;
 import java.text.SimpleDateFormat;
 
 public class NotificationHelper {
-    private static final String CHANNEL_ID="channel_id";   //通道渠道id
-    public static final String  CHANEL_NAME="chanel_name"; //通道渠道名称
-    private static SimpleDateFormat sdf=new SimpleDateFormat("HH:mm:ss");
+    private static final String CHANNEL_ID="channel_id";   //Channel channel id
+    public static final String  CHANEL_NAME="chanel_name"; //Channel name
+    @SuppressLint("SimpleDateFormat")
+    private static final SimpleDateFormat sdf=new SimpleDateFormat("HH:mm:ss");
 
 
     @TargetApi(Build.VERSION_CODES.O)
     public static  void  show(Context context){
         NotificationChannel channel = null;
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-            //创建 通知通道  channelid和channelname是必须的（自己命名就好）
+            //Creating the channel channelid and channelname is mandatory
             channel = new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.enableLights(true);//是否在桌面icon右上角展示小红点
-            channel.setLightColor(Color.GREEN);//小红点颜色
-            channel.setShowBadge(false); //是否在久按桌面图标时显示此渠道的通知
+            channel.enableLights(true);//Whether to display a small red dot in the upper right corner of the icon on the desktop
+            channel.setLightColor(Color.GREEN);//Little red dot color
+            channel.setShowBadge(false); //Whether to display notifications for this channel when long pressed on the desktop icon
         }
         Notification notification;
-        //获取Notification实例   获取Notification实例有很多方法处理    在此我只展示通用的方法（虽然这种方式是属于api16以上，但是已经可以了，毕竟16以下的Android机很少了，如果非要全面兼容可以用）
+
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-            //向上兼容 用Notification.Builder构造notification对象
 
             notification = new Notification.Builder(context,CHANNEL_ID)
-                    .setContentTitle("通知栏标题1")
-                    .setContentText("这是消息通过通知栏的内容1")
+                    .setContentTitle("channel name 1")
+                    .setContentText("info1")
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.ic_launcher_background)
                     .setColor(Color.parseColor("#FEDA26"))
                     .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.mipmap.ic_launcher))
-                    .setTicker("巴士门1")
+                    .setTicker("gate1")
                     .build();
         }else {
-            //向下兼容 用NotificationCompat.Builder构造notification对象
+
             notification = new NotificationCompat.Builder(context)
-                    .setContentTitle("通知栏标题1")
-                    .setContentText("这是消息通过通知栏的内容1")
+                    .setContentTitle("channel name 1")
+                    .setContentText("info 1")
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.ic_launcher_background)
                     .setColor(Color.parseColor("#FEDA26"))
                     .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.mipmap.ic_launcher))
-                    .setTicker("巴士门1")
+                    .setTicker("gate 1")
                     .build();
 
         }
-        notification.flags=Notification.FLAG_AUTO_CANCEL;//取消通知栏
-//        Intent intent=new Intent(context,MainActivity.class);
-//        intent.putExtra("message",":"+sdf.format(new Date()));
-        //用当前时间充当通知的id，这里是为了区分不同的通知，如果是同一个id，前者就会被后者覆盖
-//        int requestId=(int) new Date().getTime();
-//        //第一个参数连接上下文的context
-//        // 第二个参数是对PendingIntent的描述，请求值不同Intent就不同
-//        // 第三个参数是一个Intent对象，包含跳转目标
-//        // 第四个参数有4种状态
-//        PendingIntent pendingIntent=PendingIntent.getActivity(context,requestId,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-//        builder.setContentIntent(pendingIntent);
+        notification.flags=Notification.FLAG_AUTO_CANCEL;//cancel
 
-//        notification.contentIntent=pendingIntent;
-        //发送通知
+        //send notification
         int  notifiId=1;
-        //创建一个通知管理器
+        //Create a notification manager
         NotificationManager   notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
             notificationManager.createNotificationChannel(channel);

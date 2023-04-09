@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -23,11 +24,7 @@ import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
-//import com.inuker.bluetooth.library.beacon.Beacon;
-//import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
-//import com.inuker.bluetooth.library.search.SearchRequest;
-//import com.inuker.bluetooth.library.search.SearchResult;
-//import com.inuker.bluetooth.library.search.response.SearchResponse;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +35,12 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
     private TextView tvBack, tvName;
 
     private RecyclerView mRecycleView;
-    private AddDeviceRecycleViewAdapter mAdapter;//适配器
-    private List<DeviceBean> deviceBeanList = new ArrayList<>();
+    private AddDeviceRecycleViewAdapter mAdapter;//adapter
+    private final List<DeviceBean> deviceBeanList = new ArrayList<>();
 
-    // 蓝牙
+    // bluetooth
     private SearchRequest searchRequest;
-    // 蓝牙开关
+    // Bluetooth switch
     private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
         @Override
         public void onBluetoothStateChanged(boolean openOrClosed) {
@@ -54,8 +51,8 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
     };
 
-    // 蓝牙相关
-    ArrayList<BluetoothDevice> list_device = new ArrayList<>(); //蓝牙设备
+    // Bluetooth correlation
+    ArrayList<BluetoothDevice> list_device = new ArrayList<>(); //Bluetooth device
 
 
 
@@ -75,6 +72,7 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void initData() {
 
@@ -83,36 +81,24 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
 
         swipe.setEnabled(true);
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (APP.mClient.isBluetoothOpened()) {
-                                    scan();
-                                } else {
-                                    APP.mClient.openBluetooth();
-                                }
-
-                                swipe.setRefreshing(false);
-                            }
-                        });
-
-                    }
-                }).start();
-
+        swipe.setOnRefreshListener(() -> new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
+
+            runOnUiThread(() -> {
+                if (APP.mClient.isBluetoothOpened()) {
+                    scan();
+                } else {
+                    APP.mClient.openBluetooth();
+                }
+
+                swipe.setRefreshing(false);
+            });
+
+        }).start());
 
         //创建布局管理器，垂直设置LinearLayoutManager.VERTICAL，水平设置LinearLayoutManager.HORIZONTAL
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -173,6 +159,7 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
                 //图标
                 .setIcon(R.mipmap.ic_launcher)
                 .setPositiveButton("confirm", new DialogInterface.OnClickListener() {
+                    @SuppressLint("MissingPermission")
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         List<DeviceBean> deviceBeans = DeviceBean.find(DeviceBean.class, "mac = ?", deviceBeanList.get(position).getMac());
@@ -248,6 +235,7 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
             }
 
+            @SuppressLint("MissingPermission")
             @Override
             public void onDeviceFounded(SearchResult device) {
                 BluetoothDevice bluetoothDevice = device.device;

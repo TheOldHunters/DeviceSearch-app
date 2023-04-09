@@ -8,13 +8,15 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+//It is used to process the information transmission between two mobile phones in wifi-p2p mode
+
 public class SocketHandler {
     private static WifiP2pManager mManager;
     private static WifiP2pManager.Channel mChannel;
 
     private static ServerSocket serverSocket;
     private static Socket socket;
-    private static int type = 0; //0：服务端，1：客户端
+    private static int type = 0; //0: server, 1: client
 
     public static synchronized Socket getSocket(){
         return socket;

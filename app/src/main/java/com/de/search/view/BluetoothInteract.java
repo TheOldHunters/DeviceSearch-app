@@ -12,20 +12,15 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-
 
 import com.alibaba.fastjson.JSONObject;
 import com.de.search.R;
@@ -36,7 +31,6 @@ import com.de.search.bean.FriendBean;
 import com.de.search.util.BluetoothInteractService;
 import com.de.search.util.maps.Constants;
 import com.de.search.util.maps.GPSManager;
-
 
 import org.bingmaps.sdk.BingMapsView;
 import org.bingmaps.sdk.Coordinate;
@@ -59,11 +53,11 @@ public class BluetoothInteract extends BaseActivity {
     private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothInteractService mBluetoothInteractService = null;
-    private Button bt1, bt2;
+    private Button bt1, bt2; //two buttons control send and request
     private LinearLayout ll;
     private BluetoothAdapter bluetoothAdapter;
 
-    // 地图相关
+    //Map correlation
     private BingMapsView bingMapsView;
     private GPSManager _GPSManager;
     private EntityLayer _gpsLayer;
@@ -75,7 +69,7 @@ public class BluetoothInteract extends BaseActivity {
     public static final int MESSAGE_TOAST = 5;
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
-    private static final int REQUEST_CONNECT_DEVICE = 1;  //请求连接设备
+    private static final int REQUEST_CONNECT_DEVICE = 1;  //Request connection device
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int SELECT_BT = 3;
 
@@ -87,10 +81,10 @@ public class BluetoothInteract extends BaseActivity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // 判读蓝牙打开
+        //Judge Bluetooth on
         if (mBluetoothAdapter.isEnabled()) {
             if (mBluetoothInteractService == null) {
-                //创建服务对象
+                //Create a service object
                 mBluetoothInteractService = new BluetoothInteractService(this, mHandler);
                 mOutStringBuffer = new StringBuffer("");
             }
@@ -117,35 +111,30 @@ public class BluetoothInteract extends BaseActivity {
     @Override
     protected void initListener() {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        //创建选项菜单
+        //Create options menu
         toolbar.inflateMenu(R.menu.option_menu);
-        //选项菜单监听
+        //Option menu listening
         toolbar.setOnMenuItemClickListener(new MyMenuItemClickListener());
 
-        // 发送需要帮忙寻找的设备给朋友
-        bt1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        //'Send' button, send your un-find devices to your friend and let them find for you
+        bt1.setOnClickListener(view -> {
 
-                Intent serverIntent = new Intent(BluetoothInteract.this, SelectActivity.class);
-                startActivityForResult(serverIntent, SELECT_BT);
+            Intent serverIntent = new Intent(BluetoothInteract.this, SelectActivity.class);
+            //jump to devices select page
+            startActivityForResult(serverIntent, SELECT_BT);
 
 
-            }
         });
 
-        // 叫朋友发送帮我寻找到的设备过来
-        bt2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", "0");
-                jsonObject.put("id", APP.getBluetoothName());
+        //'Request' button, ask a friend to send me the device they found for me
+        bt2.setOnClickListener(view -> {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("type", "0"); //jump to case0 and process the request
+            jsonObject.put("id", APP.getBluetoothName());
 
-                // 叫朋友发送帮我寻找到的设备过来
-                BluetoothInteract.this.sendMessage(jsonObject.toJSONString());
+            ///Ask a friend to send me the device they found for me
+            BluetoothInteract.this.sendMessage(jsonObject.toJSONString());
 
-            }
         });
     }
 
@@ -174,9 +163,9 @@ public class BluetoothInteract extends BaseActivity {
             mBluetoothInteractService.stopThread();
     }
 
-    //修改本机蓝牙设备的可见性
+    //Modify the visibility of native Bluetooth devices -> set visible
     private void ensureDiscoverable() {
-        //打开手机蓝牙后，能被其它蓝牙设备扫描到的时间不是永久的
+        //After turning on the phone's Bluetooth, the time that it can be scanned by other Bluetooth devices is not permanent
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -189,8 +178,8 @@ public class BluetoothInteract extends BaseActivity {
         }
         if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            //设置在100秒内可见（能被扫描）
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 100);
+            //Set visible for 100 seconds (can be scanned)
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 100); //100s
             startActivity(discoverableIntent);
             Toast.makeText(this, "The visibility of the local Bluetooth device has been set, and the other party can search.", Toast.LENGTH_SHORT).show();
         }
@@ -205,12 +194,11 @@ public class BluetoothInteract extends BaseActivity {
             byte[] send = message.getBytes();
             mBluetoothInteractService.writeData(send);
             mOutStringBuffer.setLength(0);
-//            mOutEditText.setText(mOutStringBuffer);
         }
     }
 
 
-    //使用Handler对象在UI主线程与子线程之间传递消息
+    //Use the Handler object to pass messages between the main UI thread and its child threads
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {   //消息处理
         @Override
@@ -219,10 +207,7 @@ public class BluetoothInteract extends BaseActivity {
                 case STATE:
                     switch (msg.arg1) {
                         case BluetoothInteractService.CONNECTED:
-//                            mTitle.setText(R.string.title_connected_to);
-//                            mTitle.append(mConnectedDeviceName);
                             textView.setText(R.string.title_connected_to);
-//                            mConversationArrayAdapter.clear();
                             break;
                         case BluetoothInteractService.CONNECTING:
                             textView.setText(R.string.title_connecting);
@@ -233,41 +218,39 @@ public class BluetoothInteract extends BaseActivity {
                             break;
                     }
                     break;
-                case WRITE:
-                    // 发送数据
-//                    byte[] writeBuf = (byte[]) msg.obj;
-//                    String writeMessage = new String(writeBuf);
-//                    mConversationArrayAdapter.add("我:  " + writeMessage);
 
+                case WRITE:
 
                     break;
+
                 case READ:
-                    // 接收到数据
+                    //Received data
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-
+                    //Data analysis
                     JSONObject jsonObject = JSONObject.parseObject(readMessage);
                     String type = jsonObject.getString("type");
                     String id = jsonObject.getString("id");
                     switch (type) {
                         case "0":
-                            // 对方获取帮忙寻找到的设备，查找数据库
+                            //Send back devices you've already found for someone else, and start assembling, looking for data that already find
                             List<DeviceBean> deviceBeans = DeviceBean.find(DeviceBean.class, "(user_id = ? or messenger_id = ?) and find = ?", id, id, "1");
                             JSONObject jsonObject1 = new JSONObject();
-                            jsonObject1.put("type", "1");
+                            jsonObject1.put("type", "1"); //send a '1' to your friend, your friend's app will process in case1
                             jsonObject1.put("data", deviceBeans);
 
-                            // 发送帮忙寻找到的设备给对方
+                            //Send back devices you've already found for them
                             BluetoothInteract.this.sendMessage(jsonObject1.toJSONString());
 
                             Toast.makeText(BluetoothInteract.this, "Send the device to help find to the other party", Toast.LENGTH_LONG).show();
 
                             break;
+
                         case "1":
-                            // 对方发来帮忙寻找到的设备
+                            // They sent us the equipment they help to find
                             List<DeviceBean> deviceBeans1 = JSONObject.parseArray(jsonObject.getString("data"), DeviceBean.class);
 
-                            // 保存找到的设备信息
+                            // Save the information about the found device
                             for (DeviceBean deviceBean : deviceBeans1) {
                                 List<DeviceBean> deviceBeans3 = DeviceBean.find(DeviceBean.class, "mac = ?", deviceBean.getMac());
                                 if (deviceBeans3.size() > 0) {
@@ -278,10 +261,9 @@ public class BluetoothInteract extends BaseActivity {
                                     deviceBeans3.get(0).setLongitude(deviceBean.getLongitude());
                                     deviceBeans3.get(0).save();
                                 }
-
                             }
 
-                            // 渲染地图
+                            //Render map
                             addDevice(deviceBeans1);
 
 
@@ -290,24 +272,24 @@ public class BluetoothInteract extends BaseActivity {
 
                             break;
                         case "2":
-                            // 对方发来要帮忙寻找的设备，保存到数据库
+                            //Storing devices sent by friends who asked us to help find them
                             List<DeviceBean> deviceBeans2 = JSONObject.parseArray(jsonObject.getString("data"), DeviceBean.class);
                             for (DeviceBean deviceBean : deviceBeans2) {
-                                // 查询是否已经保存过
+                                //Query whether the file has been saved
                                 List<DeviceBean> deviceBeans3 = DeviceBean.find(DeviceBean.class, "mac = ?", deviceBean.getMac());
-                                // 保存过则不再保存
+                                //If saved, it will not be saved
                                 if (deviceBeans3.size() == 0) {
-                                    // 通过传递着的mac查询朋友自定义名称，因为在配对朋友的时候会把朋友的mac也一起保存，所以可以查到
+                                    //The custom name of the friend can be queried through the passed mac, because the friend's mac will be saved when matching friends, so it can be queried
                                     List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", deviceBean.getMessengerId());
                                     if (friendBeans.size() > 0) {
-                                        // 在数据库查出设备传递者的自定义名称并设置，传递者即是当前连接者
+                                        //Find and set the custom name of the device passer in the database, the passer is currently in connection with you
                                         deviceBean.setMessengerName(friendBeans.get(0).getUserName());
                                     }
 
-                                    // 通过拥有者的mac查询朋友自定义名称，因为在配对朋友的时候会把朋友的mac也一起保存，所以可以查到
+                                    //The custom name of the friend can be queried by the owner's mac, because the friend's mac will be saved when matching friends, so it can be queried
                                     List<FriendBean> friendBeans2 = FriendBean.find(FriendBean.class, "name = ?", deviceBean.getUserId());
                                     if (friendBeans2.size() > 0) {
-                                        // 如果我在app配对过设备拥有者，则在数据库取出设备拥有者的备注名称并设置
+                                        //If I have paired the device owner in the app, I will take out the note name of the device owner in the database and set it
                                         deviceBean.setUserName(friendBeans2.get(0).getUserName());
                                     }
 
@@ -317,7 +299,7 @@ public class BluetoothInteract extends BaseActivity {
                                     deviceBean.setFindTime("");
                                     deviceBean.setFind(0);
 
-                                    // 保存到我的设备
+                                    //Save it to my device
                                     deviceBean.save();
                                 }
                             }
@@ -328,27 +310,25 @@ public class BluetoothInteract extends BaseActivity {
                             jsonObject3.put("type", "3");
                             jsonObject3.put("mac", APP.getBluetoothName());
 
-                            // 回复，收到帮忙寻找的设备
+                            // Reply that you received the device they were looking for
                             BluetoothInteract.this.sendMessage(jsonObject3.toJSONString());
 
 
                             break;
                         case "3":
-                            Toast.makeText(BluetoothInteract.this, "Send a device that needs help finding to a friend", Toast.LENGTH_LONG).show();
+                            //Notification: The message you sent to the other guy has been successfully received and saved
+                            Toast.makeText(BluetoothInteract.this, "Send a device that needs help finding to a friend, friend has saved your devices", Toast.LENGTH_LONG).show();
 
                             String mac = jsonObject.getString("mac");
                             List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", mac);
                             if (friendBeans.size() > 0) {
                                 friendBeans.get(0).setStatus(1);
                                 friendBeans.get(0).update();
+
                             }
                             break;
 
                     }
-
-
-//                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
-//                            + readMessage);
 
                     break;
                 case MESSAGE_DEVICE_NAME:
@@ -363,12 +343,12 @@ public class BluetoothInteract extends BaseActivity {
         }
     };
 
-    //返回进入好友列表操作后的数回调方法
+    //Returns the number of callback methods after entering the buddy list operation
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CONNECT_DEVICE:
-                // 连接蓝牙
+                //Bluetooth connection
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras().getString(DeviceList.ADDRESS);
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
@@ -377,7 +357,7 @@ public class BluetoothInteract extends BaseActivity {
                 break;
             case REQUEST_ENABLE_BT:
                 if (resultCode == Activity.RESULT_OK) {
-                    //创建服务对象
+                    //Create a service object
                     mBluetoothInteractService = new BluetoothInteractService(this, mHandler);
                     mOutStringBuffer = new StringBuffer("");
                 } else {
@@ -391,8 +371,7 @@ public class BluetoothInteract extends BaseActivity {
                     String datas = data.getExtras().getString("data");
                     List<DeviceBean> deviceBeans = JSONObject.parseArray(datas, DeviceBean.class);
 
-//                    List<DeviceBean> deviceBeans = Select.from(DeviceBean.class).list();
-                    // 传递人全部改为自己
+                    //The bearer all changes to yourself.
                     for (int i = 0; deviceBeans.size() > i; i++) {
                         deviceBeans.get(i).setMessengerId(APP.getBluetoothName());
                         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -408,10 +387,10 @@ public class BluetoothInteract extends BaseActivity {
                         deviceBeans.get(i).setMessengerName(bluetoothAdapter.getName());
                     }
                     JSONObject jsonObject1 = new JSONObject();
-                    jsonObject1.put("type", "2");
-                    jsonObject1.put("data", deviceBeans);
+                    jsonObject1.put("type", "2"); //send a '2' to your friend, you friend will in case2 and process the data you send
+                    jsonObject1.put("data", deviceBeans); //data of your devices
 
-                    // 发送需要帮忙寻找的设备给朋友
+                    //Send a friend a device you need help finding
                     BluetoothInteract.this.sendMessage(jsonObject1.toJSONString());
 
                 } else {
@@ -421,7 +400,7 @@ public class BluetoothInteract extends BaseActivity {
     }
 
 
-    // -------------------------------------地图相关，用了第三方bingMaps地图---------------------------------------
+    // -------------------------------------Map related, using third-party bingMaps---------------------------------------
     private void Initialize() {
 
         _GPSManager = new GPSManager(this, new GPSLocationListener());
@@ -484,7 +463,7 @@ public class BluetoothInteract extends BaseActivity {
         routeLine.Options = polylineOptions;
         entityLayer.add(routeLine);
     }
-    // --------------------------------------地图相关，用了第三方bingMaps地图------------------------------------
+    // --------------------------------------Map related, using third-party bingMaps------------------------------------
 
     private void addDevice(List<DeviceBean> deviceBeans){
         EntityLayer entityLayer = (EntityLayer) bingMapsView.getLayerManager()
@@ -507,7 +486,7 @@ public class BluetoothInteract extends BaseActivity {
             opt.Text = deviceBeans.get(i).getName();
             opt.Anchor = new Point(11, 10);
             Pushpin p = new Pushpin(coord, opt);
-            p.Title = deviceBeans.get(i).getName();//不设置title属性，不会显示infobox(吹出框)
+            p.Title = deviceBeans.get(i).getName();//infobox will not display without title property
 
             entityLayer.add(p);
         }
@@ -531,7 +510,7 @@ public class BluetoothInteract extends BaseActivity {
         }
     }
 
-    //内部类，选项菜单的单击事件处理
+    //Inner class, click event handling for the options menu
     private class MyMenuItemClickListener implements Toolbar.OnMenuItemClickListener {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
