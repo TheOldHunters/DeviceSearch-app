@@ -42,46 +42,33 @@
         android:padding="10dp">
 
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="30dp">
+            android:layout_marginTop="30dp"
+            android:gravity="center">
 
             <EditText
                 android:id="@+id/et_pin"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:hint="Please enter a PIN"/>
+                android:hint="Please enter a PIN" />
 
             <Button
                 android:id="@+id/bt_define"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="define"
                 android:layout_marginLeft="20dp"
                 android:backgroundTint="@color/assistant"
-                />
+                android:text="define" />
 
         </LinearLayout>
-
-
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             >
-
-            <Button
-                android:id="@+id/bt_unlocking"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Biological Validation"
-                android:backgroundTint="@color/assistant"
-                />
 
         </LinearLayout>
 
@@ -92,6 +79,13 @@
                 android:id="@+id/iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/bt_unlocking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/assistant"
+                android:text="Biological Validation" />
         </LinearLayout>
 
 
