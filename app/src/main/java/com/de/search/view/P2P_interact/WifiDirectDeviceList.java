@@ -1,12 +1,9 @@
-package com.de.search.view;
+package com.de.search.view.P2P_interact;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.NetworkInfo;
@@ -17,23 +14,18 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.de.search.R;
 import com.de.search.base.BaseActivity;
 import com.de.search.bean.DeviceDataBean;
-import com.de.search.bean.FriendBean;
 import com.de.search.util.SocketHandler;
 
 import java.io.IOException;
@@ -42,17 +34,12 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+//very few ideas are referred from 'MainActivity' in the open source project below, but it was redesigned for this app and the core part is originality.
 //https://github.com/murtaza98/Walkie-Talkie/tree/master/app/src/main/java/com/example/murtaza/walkietalkie
 
-public class DirectDeviceList extends BaseActivity {
+public class WifiDirectDeviceList extends BaseActivity {
 
     public static final int PORT = 2555;
-
-
     public BroadcastReceiver mReceiver;
     public IntentFilter mIntentFilter;
     public WifiManager wifiManager;
@@ -63,7 +50,7 @@ public class DirectDeviceList extends BaseActivity {
 
     private TextView tvBack;
     public ArrayAdapter<String> mPairedDevicesArrayAdapter;
-    public static String DEVICE_NAME = "device_name";  //Mac地址
+    public static String DEVICE_NAME = "device_name";  //Mac address
 
 
     public ServerThread serverThread;
@@ -75,7 +62,7 @@ public class DirectDeviceList extends BaseActivity {
     private int num = 0;
 
 
-    // p2p寻找设备回调
+    //p2p looks for a device callback
     WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peersList) {
@@ -116,17 +103,17 @@ public class DirectDeviceList extends BaseActivity {
     };
 
 
-    // p2p连接回调
+    //p2p connection callback
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            // 连接成功后判读是什么端
+            //after successful connection then judge which side it is
             if(info.groupFormed && info.isGroupOwner){
-                // 服务端
+                // Server side
                 serverThread = new ServerThread();
                 serverThread.start();
             }else if(info.groupFormed){
-                // 客户端
+                // client side
                 clientThread = new ClientThread(info.groupOwnerAddress);
                 clientThread.start();
             }
@@ -139,7 +126,7 @@ public class DirectDeviceList extends BaseActivity {
         setView(R.layout.direct_device_list);
         super.onCreate(savedInstanceState);
 
-        //在被调用活动里，设置返回结果码
+        //In the invoked activity, set the return result code
         setResult(Activity.RESULT_CANCELED);
     }
 
@@ -163,14 +150,14 @@ public class DirectDeviceList extends BaseActivity {
         
         mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
 
-        //设备列表
+        //device list
         ListView pairedListView = findViewById(R.id.paired_devices);
         pairedListView.setAdapter(mPairedDevicesArrayAdapter);
         pairedListView.setOnItemClickListener(mPaireDeviceClickListener);
 
     }
 
-    // 配置广播
+    // Configuration of broadcast
     void set(){
         mReceiver = new WifiDirectBroadcastReceiver(mManager, mChannel);
 
@@ -202,23 +189,22 @@ public class DirectDeviceList extends BaseActivity {
 
                 click = false;
 
-                // 开始搜索设备
+                //Start searching device
                 mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(DirectDeviceList.this, "Discovery Started", Toast.LENGTH_LONG).show();
+                        Toast.makeText(WifiDirectDeviceList.this, "Discovery Started", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFailure(int reason) {
                         Log.e("reason", reason+ "");
-                        Toast.makeText(DirectDeviceList.this, "Discovery start Failed", Toast.LENGTH_LONG).show();
+                        Toast.makeText(WifiDirectDeviceList.this, "Discovery start Failed", Toast.LENGTH_LONG).show();
                     }
                 });
             }
         });
     }
-
 
 
 
@@ -250,7 +236,7 @@ public class DirectDeviceList extends BaseActivity {
         return -1;
     }
 
-    private AdapterView.OnItemClickListener mPaireDeviceClickListener = new AdapterView.OnItemClickListener() {
+    private final AdapterView.OnItemClickListener mPaireDeviceClickListener = new AdapterView.OnItemClickListener() {
         @SuppressLint("MissingPermission")
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
             select = arg2;
@@ -300,16 +286,11 @@ public class DirectDeviceList extends BaseActivity {
                     }
                 }).start();
 
-
-//                    Toast.makeText(getApplicationContext(), "Error in connecting to "+device.deviceName, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
-
-
-    // p2p广播
+    //p2p broadcasting
     public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
         private WifiP2pManager mManager;
         private WifiP2pManager.Channel mChannel;
@@ -386,14 +367,14 @@ public class DirectDeviceList extends BaseActivity {
         }
     }
 
-    // 服务端线程
+    // Server thread
     public class ServerThread extends Thread{
         Socket socket;
         ServerSocket serverSocket;
         @Override
         public void run() {
             try {
-                // 启动，等待连接
+                // Start, waiting for connection
                 serverSocket = new ServerSocket(PORT);
                 socket = serverSocket.accept();
 
@@ -420,7 +401,7 @@ public class DirectDeviceList extends BaseActivity {
         }
     }
 
-    // 客服端线程
+    // client service thread
     public class ClientThread extends Thread{
         Socket socket;
         String hostAddress;
@@ -433,27 +414,14 @@ public class DirectDeviceList extends BaseActivity {
         @Override
         public void run() {
             try {
-                // 去连接服务端
+                // to connect server side
                 socket.connect(new InetSocketAddress(hostAddress, PORT), 1000);
                 SocketHandler.setSocket(socket);
                 SocketHandler.setType(1);
             } catch (IOException e) {
                 e.printStackTrace();
-                return;
             }
         }
 
-        void go(){
-            Intent intent = new Intent();
-
-            intent.putExtra(DEVICE_NAME, customPeers.get(select).deviceName);
-
-            setResult(Activity.RESULT_OK, intent);
-
-            finish();
-        }
     }
-
-    
-
 }

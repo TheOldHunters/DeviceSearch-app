@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,8 +15,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,6 +23,8 @@ import com.de.search.adapter.DeviceRecycleViewAdapter;
 import com.de.search.app.APP;
 import com.de.search.base.BaseActivity;
 import com.de.search.bean.DeviceBean;
+import com.de.search.view.BT_interact.BluetoothInteract;
+import com.de.search.view.P2P_interact.WifiDirectInteract;
 import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -41,7 +42,7 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
     private LinearLayout l1, l2, l3;
 
     private RecyclerView mRecycleView;
-    private DeviceRecycleViewAdapter mAdapter;//适配器
+    private DeviceRecycleViewAdapter mAdapter;//adapter
     private List<DeviceBean> deviceBeanList = new ArrayList<>();
 
     private boolean open = false;
@@ -50,9 +51,9 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
     private Location location;
 
     int j = 0;
-    // 蓝牙
+    // Bluetooth
     private SearchRequest searchRequest;
-    // 蓝牙开关
+    // Bluetooth switch
     private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
         @Override
         public void onBluetoothStateChanged(boolean openOrClosed) {
@@ -63,8 +64,8 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
     };
 
-    // 蓝牙相关
-    ArrayList<BluetoothDevice> list_device = new ArrayList<>(); //蓝牙设备
+    // Bluetooth correlation
+    ArrayList<BluetoothDevice> list_device = new ArrayList<>(); //Bluetooth device
 
 
     @Override
@@ -74,6 +75,7 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
     }
 
+    @SuppressLint({"NonConstantResourceId", "SetTextI18n"})
     @Override
     protected void initView() {
         swipe = findViewById(R.id.swipe);
@@ -87,84 +89,76 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
         l3 = findViewById(R.id.ll3);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        //创建选项菜单
+        //Create options menu
         toolbar.inflateMenu(R.menu.option_menu_home);
-        //选项菜单监听
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.add:
-                        switch (APP.getType()) {
-                            case 0:
-                                APP.mClient.stopSearch();
-                                startToActivity(AddBtActivity.class);
-                                finish();
-                                break;
-                            case 1:
+        //Option menu listening
+        toolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.add:
+                    switch (APP.getType()) {
+                        case 0:
+                            APP.mClient.stopSearch();
+                            startToActivity(AddBtActivity.class);
+                            finish();
+                            break;
+                        case 1:
+                        case 2:
+                            break;
+                    }
+                    finish();
 
-                                break;
-                            case 2:
+                    return true;
+                case R.id.open:
+                    if (thread == null) {
 
-                                break;
-                        }
-                        finish();
-
-                        return true;
-                    case R.id.open:
-                        if (thread == null) {
-
-                            thread = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    while (open) {
-                                        Location location = APP.getLastKnownLocation();
-                                        if (location != null) {
-                                            HomeActivity.this.location = location;
-                                        }
-
-                                        scan();
-
-                                        try {
-                                            Thread.sleep(12000);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                            return;
-                                        }
-                                    }
+                        thread = new Thread(() -> {
+                            while (open) {
+                                Location location = APP.getLastKnownLocation();
+                                if (location != null) {
+                                    HomeActivity.this.location = location;
                                 }
-                            });
-                            tvInfo.setText("open");
-                            open = true;
 
-                            thread.start();
-                        }
+                                scan();
 
-                        return true;
-                    case R.id.close:
-                        tvInfo.setText("close");
-                        open = false;
+                                try {
+                                    Thread.sleep(12000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                    return;
+                                }
+                            }
+                        });
+                        tvInfo.setText("open");
+                        open = true;
 
-                        if (thread != null && thread.isAlive()) {
-                            thread.interrupt();
-                            thread = null;
-                        }
+                        thread.start();
+                    }
 
-                        return true;
+                    return true;
+                case R.id.close:
+                    tvInfo.setText("close");
+                    open = false;
 
-                }
-                return false;
+                    if (thread != null && thread.isAlive()) {
+                        thread.interrupt();
+                        thread = null;
+                    }
+
+                    return true;
+
             }
+            return false;
         });
 
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void initData() {
 
 
-        // 开启蓝牙扫描
+        // Enable Bluetooth scanning
         APP.mClient.registerBluetoothStateListener(mBluetoothStateListener);
 
         if (APP.mClient.isBluetoothOpened()) {
@@ -177,96 +171,79 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
         tvName.setText("Bluetooth List");
 
         swipe.setEnabled(true);
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipe.setOnRefreshListener(() -> new Thread(new Runnable() {
             @Override
-            public void onRefresh() {
-                new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                runOnUiThread(new Runnable() {
+                    @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        deviceBeanList.clear();
+                        deviceBeanList.addAll(DeviceBean.find(DeviceBean.class, "type = ?", String.valueOf(APP.getType())));
+                        mAdapter.notifyDataSetChanged();
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                deviceBeanList.clear();
-                                deviceBeanList.addAll(DeviceBean.find(DeviceBean.class, "type = ?", String.valueOf(APP.getType())));
-                                mAdapter.notifyDataSetChanged();
-
-                                swipe.setRefreshing(false);
-                            }
-                        });
-
+                        swipe.setRefreshing(false);
                     }
-                }).start();
+                });
 
             }
-        });
+        }).start());
 
-        // 查本地数据库的蓝牙设备
+        // Check Bluetooth devices in the local database
         deviceBeanList = DeviceBean.find(DeviceBean.class, "type = ?", String.valueOf(APP.getType()));
 
-        //创建布局管理器，垂直设置LinearLayoutManager.VERTICAL，水平设置LinearLayoutManager.HORIZONTAL
+        //Create a layout manager, set vertically in 'LinearLayoutManager.VERTICAL'; set horizontally in 'LinearLayoutManager.HORIZONTAL'
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        //创建适配器，将数据传递给适配器
+        //Create the adapter and pass the data to the adapter
         mAdapter = new DeviceRecycleViewAdapter(deviceBeanList, this);
-        //设置布局管理器
+        //Set up the layout manager
         mRecycleView.setLayoutManager(mLinearLayoutManager);
-        //设置适配器adapter
+        //Set adapter
         mRecycleView.setAdapter(mAdapter);
-
-//        Log.e("mac", APP.getBluetoothName());
 
     }
 
     @Override
     protected void initListener() {
 
-        l1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                APP.mClient.stopSearch();
-                startToActivity(BluetoothInteract.class);
-                finish();
-            }
+        //l1 is the 'BT' button in the below toolbar, click this will jump to BT interact function, which belong to BluetoothInteract.class
+        l1.setOnClickListener(view -> {
+            APP.mClient.stopSearch();
+            startToActivity(BluetoothInteract.class);
+            finish();
         });
 
-        l2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                APP.mClient.stopSearch();
-                startToActivity(DirectInteract.class);
-                finish();
-            }
+        //l2 is the 'P2P' button in the below toolbar, click this will jump to BT interact function, which belong to WifiDirectInteract.class
+        l2.setOnClickListener(view -> {
+            APP.mClient.stopSearch();
+            startToActivity(WifiDirectInteract.class);
+            finish();
         });
 
-        l3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                APP.mClient.stopSearch();
-                startToActivity(ExplainActivity.class);
-                finish();
-            }
+        //l3 is the 'Introduction' button in the below toolbar, click this will jump to BT interact function, which belong to WifiDirectInteract.class
+        l3.setOnClickListener(view -> {
+            APP.mClient.stopSearch();
+            startToActivity(IntroductionActivity.class);
+            finish();
         });
 
-
-        tvSet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                APP.mClient.stopSearch();
-                startToActivity(SetActivity.class);
-                finish();
-            }
+        //the 'set' button oon the top left side
+        tvSet.setOnClickListener(view -> {
+            APP.mClient.stopSearch();
+            startToActivity(SetActivity.class);
+            finish();
         });
 
     }
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         APP.mClient.stopSearch();
 
         open = false;
@@ -288,33 +265,26 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
             thread.interrupt();
             thread = null;
         }
-
-
-
-
     }
 
     @Override
     public void onLongClick(int position) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
-                //标题
+                //title
                 .setTitle("Delete device")
-                //内容
+                //content
                 .setMessage("Delete " + deviceBeanList.get(position).getName() + " to my device")
-                //图标
+                //icon
                 .setIcon(R.mipmap.ic_launcher)
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (deviceBeanList.get(position).delete()) {
-                            showToast("Delete succeeded");
-                            deviceBeanList.remove(position);
-                            mAdapter.notifyDataSetChanged();
-                        } else {
-                            showToast("Delete failed");
-                        }
-
+                .setPositiveButton("Delete", (dialogInterface, i) -> {
+                    if (deviceBeanList.get(position).delete()) {
+                        showToast("Delete succeeded");
+                        deviceBeanList.remove(position);
+                        mAdapter.notifyDataSetChanged();
+                    } else {
+                        showToast("Delete failed");
                     }
+
                 })
                 .setNegativeButton("Cancel", null)
                 .create();
@@ -347,8 +317,8 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(5000, 1) // 先扫 BLE 设备 1 次，每次 5s
-                    .searchBluetoothClassicDevice(5000) // 再扫经典蓝牙 5s
+                    .searchBluetoothLeDevice(5000, 1) //Scan the BLE device once for 5s each time
+                    .searchBluetoothClassicDevice(5000) //Then scan the classic Bluetooth 5s
                     .build();
         }
         APP.mClient.search(searchRequest, new SearchResponse() {
@@ -357,15 +327,16 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDeviceFounded(SearchResult device) {
                 BluetoothDevice bluetoothDevice = device.device;
                 j += 1;
 
-                String deviceName = bluetoothDevice.getName();
+                @SuppressLint("MissingPermission") String deviceName = bluetoothDevice.getName();
                 String deviceHardwareAddress = bluetoothDevice.getAddress(); // MAC address
 
-                if (!TextUtils.isEmpty(deviceName) && !deviceName.equals("NULL") && !list_device.contains(bluetoothDevice)) {   //加入到list中
+                if (!TextUtils.isEmpty(deviceName) && !deviceName.equals("NULL") && !list_device.contains(bluetoothDevice)) {   //Add it to the list
                     list_device.add(bluetoothDevice);
                 } else {
                     return;
@@ -388,14 +359,11 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
                         return;
                     }
                 }
-
-
             }
 
             @Override
             public void onSearchStopped() {
                 Log.e("onSearchStopped", "onSearchStopped");
-
             }
 
             @Override
@@ -404,8 +372,5 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
             }
 
         });
-
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.de.search.view;
+package com.de.search.view.BT_interact;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,6 +30,8 @@ import com.de.search.bean.FriendBean;
 import com.de.search.util.BluetoothInteractService;
 import com.de.search.util.maps.Constants;
 import com.de.search.util.maps.GPSManager;
+import com.de.search.view.HomeActivity;
+import com.de.search.view.SelectActivity;
 
 import org.bingmaps.sdk.BingMapsView;
 import org.bingmaps.sdk.Coordinate;
@@ -350,7 +351,7 @@ public class BluetoothInteract extends BaseActivity {
             case REQUEST_CONNECT_DEVICE:
                 //Bluetooth connection
                 if (resultCode == Activity.RESULT_OK) {
-                    String address = data.getExtras().getString(DeviceList.ADDRESS);
+                    String address = data.getExtras().getString(BluetoothDeviceList.ADDRESS);
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
                     mBluetoothInteractService.onConnect(device);
                 }
@@ -516,7 +517,7 @@ public class BluetoothInteract extends BaseActivity {
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.scan:
-                    Intent serverIntent = new Intent(BluetoothInteract.this, DeviceList.class);
+                    Intent serverIntent = new Intent(BluetoothInteract.this, BluetoothDeviceList.class);
                     startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                     return true;
                 case R.id.discoverable:

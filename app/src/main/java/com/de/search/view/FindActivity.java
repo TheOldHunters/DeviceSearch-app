@@ -2,6 +2,7 @@ package com.de.search.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -54,17 +55,15 @@ import java.util.List;
 
 public class FindActivity extends BaseActivity {
 
-    // 地图相关
+    // Map correlation
     private BingMapsView bingMapsView;
     private GPSManager _GPSManager;
     private EntityLayer _gpsLayer;
 
-    //声明一个操作常量字符串
+    //Declares an operation constant string
     public static final String ACTION_SERVICE_NEED = "action.ServiceNeed";
-    //声明一个内部广播实例
+    //Declare an internal broadcast instance
     public ServiceNeedBroadcastReceiver broadcastReceiver;
-
-    private FindService.FindBinder findBinder;
 
 
     private TextView tvName, tvDistance, tvBack, tvRssi, tvMac, tvStatus, tvNum, tvDetail;
@@ -80,10 +79,10 @@ public class FindActivity extends BaseActivity {
 
 
     private Intent sIntent;
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            findBinder = (FindService.FindBinder) service;
+            FindService.FindBinder findBinder = (FindService.FindBinder) service;
         }
 
         @Override
@@ -113,13 +112,14 @@ public class FindActivity extends BaseActivity {
         bt = findViewById(R.id.bt);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void initData() {
 
         Initialize();
 
         /**
-         * 注册广播实例（在初始化的时候）
+         * Register a broadcast instance (at initialization time)
          */
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_SERVICE_NEED);
@@ -151,53 +151,39 @@ public class FindActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
-        tvBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startToActivity(HomeActivity.class);
-                finish();
-            }
+        tvBack.setOnClickListener(view -> {
+            startToActivity(HomeActivity.class);
+            finish();
         });
 
-        bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                if (from.equals("0")){
-//                    startToActivity(HomeActivity.class);
-//                }else {
-//                    startToActivity(UserDeviceActivity.class);
-//                }
-//                finish();
+        //button of 'Find it', click this the service of find will be stopped
+        bt.setOnClickListener(view -> {
 
-                if (!stop){
-                    unbindService(connection);
-                    unregisterReceiver(broadcastReceiver);
-                    stopService(sIntent);
-                    APP.isFind = false;
+            if (!stop){
+                unbindService(connection);
+                unregisterReceiver(broadcastReceiver);
+                stopService(sIntent);
+                APP.isFind = false;
 
-                    stop = true;
-                }
-
+                stop = true;
             }
+
         });
 
-        tvDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tvMac.getVisibility() == View.GONE){
-                    tvMac.setVisibility(View.VISIBLE);
-                    tvRssi.setVisibility(View.VISIBLE);
-                }else {
-                    tvMac.setVisibility(View.GONE);
-                    tvRssi.setVisibility(View.GONE);
-                }
+        //'Detail' button inside the device's information, click this the rssi and mac info will be displayed
+        tvDetail.setOnClickListener(view -> {
+            if (tvMac.getVisibility() == View.GONE){
+                tvMac.setVisibility(View.VISIBLE);
+                tvRssi.setVisibility(View.VISIBLE);
+            }else {
+                tvMac.setVisibility(View.GONE);
+                tvRssi.setVisibility(View.GONE);
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         startToActivity(HomeActivity.class);
         finish();
     }
@@ -211,9 +197,7 @@ public class FindActivity extends BaseActivity {
             APP.isFind = false;
         }
 
-
         super.onDestroy();
-//        APP.mClient.stopSearch();
 
     }
 
@@ -221,28 +205,11 @@ public class FindActivity extends BaseActivity {
 
         _GPSManager = new GPSManager(this, new FindActivity.GPSLocationListener());
 
-        // Add more data layers here
-//        _dataLayers = new String[]{getString(R.string.traffic)};
-//        _dataLayerSelections = new boolean[_dataLayers.length];
-//
-//        _loadingScreen = new ProgressDialog(this);
-//        _loadingScreen.setCancelable(false);
-//        _loadingScreen.setMessage(this.getString(R.string.loading) + "...");
-
         bingMapsView = (BingMapsView) findViewById(R.id.mapView);
-
-        // Create handler to switch out of Splash screen mode
-//        final Handler viewHandler = new Handler() {
-//            public void handleMessage(Message msg) {
-//                ((ViewFlipper) findViewById(R.id.flipper)).setDisplayedChild(1);
-//            }
-//        };
 
         // Add a map loaded event handler
         bingMapsView.setMapLoadedListener(new MapLoadedListener() {
             public void onAvailableChecked() {
-                // hide splash screen and go to map
-//                viewHandler.sendEmptyMessage(0);
 
                 // Add GPS layer
                 _gpsLayer = new EntityLayer(Constants.DataLayers.GPS);
@@ -257,16 +224,6 @@ public class FindActivity extends BaseActivity {
                 }
             }
         });
-
-        // Add a entity clicked event handler
-//        bingMapsView.setEntityClickedListener(new EntityClickedListener() {
-//            public void onAvailableChecked(String layerName, int entityId) {
-//                HashMap<String, Object> metadata = bingMapsView
-//                        .getLayerManager().GetMetadataByID(layerName, entityId);
-//                DialogLauncher.LaunchEntityDetailsDialog(_baseActivity,
-//                        metadata);
-//            }
-//        });
 
         // Load the map
         bingMapsView.loadMap(Constants.BingMapsKey,
@@ -335,9 +292,9 @@ public class FindActivity extends BaseActivity {
             double latitude = Double.parseDouble(deviceBeans.get(i).getLatitude());
 
             Coordinate coord = new Coordinate(latitude, longitude);
-            // 实现标记必须用到 Pushpin 来做标记。
-            // PushpinOptions可以对 Pushpin所要标记的设置属性
-            // opt.Icon图标 opt.Anchor点的位置
+            // Use Pushpin to mark on the map
+            // PushpinOptions is used to set attributes for Pushpin
+            // opt.Icon - The icon of PushPin, opt.Anchor - The position to display Pushpin
             PushpinOptions opt = new PushpinOptions();
             opt.Icon = "file:///android_asset/pin_red_flag.png";
             opt.Width = 20;
@@ -345,7 +302,7 @@ public class FindActivity extends BaseActivity {
             opt.Text = deviceBeans.get(i).getName();
             opt.Anchor = new Point(11, 10);
             Pushpin p = new Pushpin(coord, opt);
-            p.Title = deviceBeans.get(i).getName();//不设置title属性，不会显示infobox(吹出框)
+            p.Title = deviceBeans.get(i).getName();//If the title attribute is not set, infobox will not be displayed
 
             entityLayer.add(p);
         }
@@ -371,12 +328,13 @@ public class FindActivity extends BaseActivity {
     }
 
     /**
-     * 定义广播接收器，用于执行Service服务的需求（内部类）
+     * Defines the broadcast sink that performs the requirements of the Service service (inner class)
      */
     private class ServiceNeedBroadcastReceiver extends BroadcastReceiver {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onReceive(Context context, Intent intent) {
-            //这里是要在Activity活动里执行的代码
+            //Here is the code to execute in the Activity
             String distance = intent.getStringExtra("distance");
             String rssi = intent.getStringExtra("rssi");
             String status = intent.getStringExtra("status");
@@ -391,11 +349,11 @@ public class FindActivity extends BaseActivity {
             if (!TextUtils.isEmpty(num))
                 tvNum.setText("scan times：" + num);
 
-            // 找到
+            // find the device
             if ("detected".equals(status)){
                 deviceBean.setRssi(Integer.parseInt(rssi));
                 deviceBean.setFind(1);
-                deviceBean.setFindTime(APP.formatter.format(new Date(System.currentTimeMillis())));
+                deviceBean.setFindTime(APP.formatter.format(new Date(System.currentTimeMillis()))); //record the time while finding
                 if (APP.location != null){
                     deviceBean.setLongitude(APP.location.getLongitude()+"");
                     deviceBean.setLatitude(APP.location.getLatitude()+"");
@@ -404,15 +362,14 @@ public class FindActivity extends BaseActivity {
                 deviceBean.save();
 
                 if (!TextUtils.isEmpty(deviceBean.getLatitude()) && !TextUtils.isEmpty(deviceBean.getLongitude())){
-                    // 标记位置
+                    // mark the location while finding
+                    //Since the device to be found at this time should be near the phone
+                    //thus the geographical location of the phone at this time is the approximate location of the device to be found
                     List<DeviceBean> deviceBeans = new ArrayList<>();
                     deviceBeans.add(deviceBean);
                     addDevice(deviceBeans);
                 }
             }
-
         }
     }
-
-
 }

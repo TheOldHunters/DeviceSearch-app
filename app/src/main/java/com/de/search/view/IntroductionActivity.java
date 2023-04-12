@@ -1,20 +1,17 @@
 package com.de.search.view;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 
 import com.de.search.R;
 import com.de.search.base.BaseActivity;
 
-public class ExplainActivity extends BaseActivity {
+public class IntroductionActivity extends BaseActivity {
     private TextView tvBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setView(R.layout.activity_explain);
+        setView(R.layout.activity_introduction);
         super.onCreate(savedInstanceState);
 
     }
@@ -32,12 +29,9 @@ public class ExplainActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
-        tvBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startToActivity(HomeActivity.class);
-                finish();
-            }
+        tvBack.setOnClickListener(view -> {
+            startToActivity(HomeActivity.class);
+            finish();
         });
     }
 

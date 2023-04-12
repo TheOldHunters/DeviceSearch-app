@@ -1,7 +1,6 @@
 package com.de.search.util;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -11,7 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.de.search.app.APP;
-import com.de.search.view.BluetoothInteract;
+import com.de.search.view.BT_interact.BluetoothInteract;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +18,7 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 // This class is the Bluetooth communication between two mobile phones' connection, sending and receiving information
-// Some ideas are referred from 'ChatService' in the open source project below, but it was redesigned for this app
+// Some ideas are referred from 'ChatService' in the open source project below, but it was redesigned for this app and the core part is originality.
 // https://gitee.com/liu_peilin/bluetooth-communication
 
 public class BluetoothInteractService {
