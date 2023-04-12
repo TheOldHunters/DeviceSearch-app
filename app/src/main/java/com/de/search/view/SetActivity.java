@@ -2,7 +2,6 @@ package com.de.search.view;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,14 +11,14 @@ import com.de.search.app.APP;
 import com.de.search.base.BaseActivity;
 import com.de.search.util.LocalStorageUtils;
 
+//this class is the 'Set' button on the top left side in 'Home' page, used to edit the reminder distance and the PIN password
+
 public class SetActivity extends BaseActivity {
 
 
     private EditText et1, et2;
     private Button bt1;
     private TextView tvBack;
-
-
 
 
     @Override
@@ -39,7 +38,6 @@ public class SetActivity extends BaseActivity {
 
         tvBack = findViewById(R.id.tv_back);
 
-
     }
 
     @Override
@@ -54,40 +52,31 @@ public class SetActivity extends BaseActivity {
     @Override
     protected void initListener() {
 
-        tvBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startToActivity(HomeActivity.class);
-                finish();
-            }
+        //'back' button to return 'Home'
+        tvBack.setOnClickListener(view -> {
+            startToActivity(HomeActivity.class);
+            finish();
         });
 
-
-
-
-        bt1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (TextUtils.isEmpty(et1.getText().toString())){
-                    showToast("Please enter reminder distance");
-                    return;
-                }
-
-                if (TextUtils.isEmpty(et2.getText().toString())){
-                    showToast("Please enter PIN");
-                    return;
-                }
-
-                APP.setDistance(Integer.parseInt(et1.getText().toString()));
-                APP.setPin(et2.getText().toString());
-                LocalStorageUtils.setParam(SetActivity.this, "distance", APP.getDistance());
-                LocalStorageUtils.setParam(SetActivity.this, "pin", APP.getPin());
-
-                showToast("Saved successfully");
+        //'save' button
+        bt1.setOnClickListener(view -> {
+            if (TextUtils.isEmpty(et1.getText().toString())){
+                showToast("Please enter reminder distance"); //If the correct reminder distance is not entered, this entry is displayed
+                return;
             }
+
+            if (TextUtils.isEmpty(et2.getText().toString())){
+                showToast("Please enter PIN");//If the correct PIN is not entered, this entry is displayed
+                return;
+            }
+
+            APP.setDistance(Integer.parseInt(et1.getText().toString()));
+            APP.setPin(et2.getText().toString());
+            LocalStorageUtils.setParam(SetActivity.this, "distance", APP.getDistance());
+            LocalStorageUtils.setParam(SetActivity.this, "pin", APP.getPin());
+
+            showToast("Saved successfully");
         });
-
-
 
     }
 

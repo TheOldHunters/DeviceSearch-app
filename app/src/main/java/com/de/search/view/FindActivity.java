@@ -1,13 +1,6 @@
 package com.de.search.view;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,13 +9,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.location.LocationListener;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,10 +23,6 @@ import com.de.search.bean.DeviceBean;
 import com.de.search.service.FindService;
 import com.de.search.util.maps.Constants;
 import com.de.search.util.maps.GPSManager;
-//import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
-//import com.inuker.bluetooth.library.search.SearchRequest;
-//import com.inuker.bluetooth.library.search.SearchResult;
-//import com.inuker.bluetooth.library.search.response.SearchResponse;
 
 import org.bingmaps.sdk.BingMapsView;
 import org.bingmaps.sdk.Coordinate;

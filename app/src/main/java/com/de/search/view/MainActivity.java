@@ -2,7 +2,6 @@ package com.de.search.view;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -24,7 +24,7 @@ import java.util.List;
 public class MainActivity extends BaseActivity {
 
     /**
-     * 需要进行检测的权限数组
+     * An array of permissions to be checked
      */
     protected String[] needPermissions = {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -34,7 +34,7 @@ public class MainActivity extends BaseActivity {
             Manifest.permission.FOREGROUND_SERVICE
     };
     /**
-     * 判断是否需要检测，防止不停的弹框
+     * Determine whether it needs to be detected to prevent constant pop-up
      */
     private boolean isNeedCheck = true;
     private static final int PERMISSON_REQUESTCODE = 0;
@@ -69,46 +69,37 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * 检查权限
+     * Check authority
      *
      * @param
      * @since 2.5.0
      */
     private void checkPermissions(String... permissions) {
-        //获取权限列表
+        //Get permission list
         List<String> needRequestPermissonList = findDeniedPermissions(permissions);
-        if (null != needRequestPermissonList
-                && needRequestPermissonList.size() > 0) {
-            //list.toarray将集合转化为数组
+        if (needRequestPermissonList.size() > 0) {
+            //'list.toArray' Convert a collection to an array
             ActivityCompat.requestPermissions(this,
                     needRequestPermissonList.toArray(new String[needRequestPermissonList.size()]),
                     PERMISSON_REQUESTCODE);
         }else {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-//                            startToActivity(LoginActivity.class);
-                            startToActivity(VerifyActivity.class);
-//                            startToActivity(BluetoothChat.class);
-                            finish();
-                        }
-                    });
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+
+                runOnUiThread(() -> {
+                    startToActivity(VerifyActivity.class);
+                    finish();
+                });
             }).start();
         }
     }
 
     /**
-     * 获取权限集中需要申请权限的列表
+     * Obtain the list of permissions to be applied for in the permission set
      *
      * @param permissions
      * @return
@@ -116,7 +107,7 @@ public class MainActivity extends BaseActivity {
      */
     private List<String> findDeniedPermissions(String[] permissions) {
         List<String> needRequestPermissonList = new ArrayList<String>();
-        //for (循环变量类型 循环变量名称 : 要被遍历的对象)
+        //for (Loop variable type   Loop variable name : The object to be traversed)
         for (String perm : permissions) {
             if (ContextCompat.checkSelfPermission(this,
                     perm) != PackageManager.PERMISSION_GRANTED
@@ -129,9 +120,8 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * 检测是否说有的权限都已经授权
+     * Checks whether all permissions have been authorized
      *
-     * @param grantResults
      * @return
      * @since 2.5.0
      */
@@ -146,38 +136,30 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] paramArrayOfInt) {
+                                           @NonNull String[] permissions, @NonNull int[] paramArrayOfInt) {
         if (requestCode == PERMISSON_REQUESTCODE) {
-            if (!verifyPermissions(paramArrayOfInt)) {      //没有授权
-                showMissingPermissionDialog();              //显示提示信息
+            if (!verifyPermissions(paramArrayOfInt)) {      //Without authorization
+                showMissingPermissionDialog();              //Display prompt information
                 isNeedCheck = false;
             }else {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-//                                startToActivity(LoginActivity.class);
-                                startToActivity(VerifyActivity.class);
-//                                startToActivity(BluetoothChat.class);
-                                finish();
-                            }
-                        });
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
+
+                    runOnUiThread(() -> {
+                        startToActivity(VerifyActivity.class);
+                        finish();
+                    });
                 }).start();
             }
         }
     }
 
     /**
-     * 显示提示信息
+     * Display prompt information
      *
      * @since 2.5.0
      */
@@ -186,22 +168,14 @@ public class MainActivity extends BaseActivity {
         builder.setTitle(R.string.notifyTitle);
         builder.setMessage(R.string.notifyMsg);
 
-        // 拒绝, 退出应用
+        // Rejected, then exit the application
         builder.setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                });
+                (dialog, which) -> finish());
 
         builder.setPositiveButton(R.string.setting,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        isNeedCheck = true;
-                        startAppSettings();
-                    }
+                (dialog, which) -> {
+                    isNeedCheck = true;
+                    startAppSettings();
                 });
 
         builder.setCancelable(false);
@@ -210,7 +184,7 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * 启动应用的设置
+     *The Settings for starting an application
      *
      * @since 2.5.0
      */

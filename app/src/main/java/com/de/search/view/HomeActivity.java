@@ -1,15 +1,8 @@
 package com.de.search.view;
 
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,6 +10,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.de.search.R;
 import com.de.search.adapter.DeviceRecycleViewAdapter;
@@ -33,6 +32,8 @@ import com.inuker.bluetooth.library.search.response.SearchResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+//same as the 'FindService' class, here import the inuker bluetoothkit library to implement 'open search' function
 
 public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapter.DeviceRecycleViewAdapterInterface {
 

@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,10 +20,12 @@ import com.de.search.util.LocalStorageUtils;
 
 import java.util.concurrent.Executor;
 
+//this class is used for user authentication, as this app may contains some privacy information.
+//here import the Android biometric library for facial or fingerprint recognition
+
 public class VerifyActivity extends BaseActivity {
 
     private EditText etPin;
-    private ImageView iv;
     private Button btDefine, btUnlocking;
 
 
@@ -46,7 +47,7 @@ public class VerifyActivity extends BaseActivity {
     @Override
     protected void initView() {
         etPin = findViewById(R.id.et_pin);
-        iv = findViewById(R.id.iv);
+        ImageView iv = findViewById(R.id.iv);
         btDefine = findViewById(R.id.bt_define);
         btUnlocking = findViewById(R.id.bt_unlocking);
     }
@@ -57,13 +58,7 @@ public class VerifyActivity extends BaseActivity {
 
         verifyHandler = new Handler();
 
-        executor = new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                verifyHandler.post(command);
-            }
-        };
-
+        executor = command -> verifyHandler.post(command);
 
         pin = (String) LocalStorageUtils.getParam(this, "pin", "");
 
@@ -78,42 +73,36 @@ public class VerifyActivity extends BaseActivity {
     @Override
     protected void initListener() {
 
-        btDefine.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btDefine.setOnClickListener(view -> {
 
-                if (TextUtils.isEmpty(etPin.getText().toString())) {
-                    showToast("PIN is null");
-                    return;
-                }
-
-                if (!etPin.getText().toString().equals(pin)) {
-                    showToast("PIN incorrect");
-                    return;
-                }
-
-                APP.pin = pin;
-
-                startToActivity(HomeActivity.class);
-                finish();
+            if (TextUtils.isEmpty(etPin.getText().toString())) {
+                showToast("PIN is null");
+                return;
             }
+
+            if (!etPin.getText().toString().equals(pin)) {
+                showToast("PIN incorrect");
+                return;
+            }
+
+            APP.pin = pin;
+
+            startToActivity(HomeActivity.class);
+            finish();
         });
 
-        btUnlocking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int type = manager.canAuthenticate();
-                if (type == BiometricManager.BIOMETRIC_SUCCESS) {
-                    verify();
-                } else if (type == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE) {
-                    showToast("No biometric features are available on this device");
-                } else if (type == BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE) {
-                    showToast("The biometric feature is currently unavailable");
-                } else {
-                    showToast("The user did not enter biometric data");
-                }
-
+        btUnlocking.setOnClickListener(view -> {
+            int type = manager.canAuthenticate();
+            if (type == BiometricManager.BIOMETRIC_SUCCESS) {
+                verify();
+            } else if (type == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE) {
+                showToast("No biometric features are available on this device");
+            } else if (type == BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE) {
+                showToast("The biometric feature is currently unavailable");
+            } else {
+                showToast("The user did not enter biometric data");
             }
+
         });
 
 
@@ -126,31 +115,23 @@ public class VerifyActivity extends BaseActivity {
 
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setView(inputServer)
-                //标题
+                //title
                 .setTitle("set PIN")
-                //内容
+                //content
                 .setMessage("Please enter your PIN")
-                //图标
+                //icon
                 .setIcon(R.mipmap.ic_launcher)
-                .setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String pin = inputServer.getText().toString();
-                        if (TextUtils.isEmpty(pin)) {
-                            showToast("Please enter your PIN");
-                            openDialog();
-                        } else {
-                            LocalStorageUtils.setParam(VerifyActivity.this, "pin", pin);
-                            VerifyActivity.this.pin = pin;
-                        }
-                    }
-                })
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setPositiveButton("confirm", (dialogInterface, i) -> {
+                    String pin = inputServer.getText().toString();
+                    if (TextUtils.isEmpty(pin)) {
+                        showToast("Please enter your PIN");
                         openDialog();
+                    } else {
+                        LocalStorageUtils.setParam(VerifyActivity.this, "pin", pin);
+                        VerifyActivity.this.pin = pin;
                     }
                 })
+                .setNegativeButton("cancel", (dialogInterface, i) -> openDialog())
                 .create();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
@@ -174,7 +155,7 @@ public class VerifyActivity extends BaseActivity {
 
             }
 
-            //成功
+            //Successful verification
             @Override
             public void onAuthenticationSucceeded(
                     @NonNull BiometricPrompt.AuthenticationResult result) {
@@ -184,7 +165,7 @@ public class VerifyActivity extends BaseActivity {
                 finish();
             }
 
-            //失败
+            //failure
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();

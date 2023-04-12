@@ -1,10 +1,10 @@
 package com.de.search.view;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +23,8 @@ import com.de.search.bean.DeviceBean;
 import java.util.ArrayList;
 import java.util.List;
 
+//this class is the activity that allows user to select their preferred devices that they want their friend to help them find, then send to their friend's phone
+
 public class SelectActivity extends BaseActivity {
 
     private TextView tvBack, tvName, tvInfo;
@@ -30,7 +32,7 @@ public class SelectActivity extends BaseActivity {
     private Button bt;
 
     private RecyclerView mRecycleView;
-    private SelectDeviceRecycleViewAdapter mAdapter;//适配器
+    private SelectDeviceRecycleViewAdapter mAdapter;//adapter
     private List<DeviceBean> deviceBeanList = new ArrayList<>();
 
 
@@ -56,93 +58,63 @@ public class SelectActivity extends BaseActivity {
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void initData() {
 
         swipe.setEnabled(true);
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                deviceBeanList.clear();
-                                deviceBeanList.addAll(DeviceBean.find(DeviceBean.class, "type = ?", String.valueOf(APP.getType())));
-                                mAdapter.notifyDataSetChanged();
-
-                                swipe.setRefreshing(false);
-                            }
-                        });
-
-                    }
-                }).start();
-
+        swipe.setOnRefreshListener(() -> new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
 
-        // 查本地数据库的蓝牙设备
+            runOnUiThread(() -> {
+                deviceBeanList.clear();
+                deviceBeanList.addAll(DeviceBean.find(DeviceBean.class, "type = ?", String.valueOf(APP.getType())));
+                mAdapter.notifyDataSetChanged();
+
+                swipe.setRefreshing(false);
+            });
+
+        }).start());
+
+        //Check Bluetooth devices in the local database
         deviceBeanList = DeviceBean.find(DeviceBean.class, "type = ?", String.valueOf(APP.getType()));
 
-        //创建布局管理器，垂直设置LinearLayoutManager.VERTICAL，水平设置LinearLayoutManager.HORIZONTAL
+        //Create a layout manager, set vertically in 'LinearLayoutManager.VERTICAL'; set horizontally in 'LinearLayoutManager.HORIZONTAL'
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        //创建适配器，将数据传递给适配器
+        //Create the adapter and pass the data to the adapter
         mAdapter = new SelectDeviceRecycleViewAdapter(deviceBeanList);
-        //设置布局管理器
+        //Set up the layout manager
         mRecycleView.setLayoutManager(mLinearLayoutManager);
-        //设置适配器adapter
+        //Setup adapter
         mRecycleView.setAdapter(mAdapter);
-
-
-
     }
 
     @Override
     protected void initListener() {
 
-        tvBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
+        tvBack.setOnClickListener(view -> finish());
+
+        bt.setOnClickListener(view -> {
+            List<DeviceBean> deviceBeans = mAdapter.getDeviceBeanList();
+            if (deviceBeans.size() == 0){
+                Toast.makeText(SelectActivity.this, "No choice", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            String data = JSONObject.toJSONString(deviceBeans);
+            Intent intent = new Intent();
+            intent.putExtra("data", data);  //data
+            setResult(Activity.RESULT_OK, intent);
+            finish();
         });
-
-        bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<DeviceBean> deviceBeans = mAdapter.getDeviceBeanList();
-                if (deviceBeans.size() == 0){
-                    Toast.makeText(SelectActivity.this, "No choice", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String data = JSONObject.toJSONString(deviceBeans);
-                Intent intent = new Intent();
-                intent.putExtra("data", data);  // 数据
-                setResult(Activity.RESULT_OK, intent);
-                finish();
-            }
-        });
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-
-
     }
-
-
-
 }
