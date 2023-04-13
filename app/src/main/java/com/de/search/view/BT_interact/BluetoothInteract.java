@@ -12,6 +12,7 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -306,6 +307,7 @@ public class BluetoothInteract extends BaseActivity {
                             }
 
                             Toast.makeText(BluetoothInteract.this, "Received the equipment sent by the other party to help find", Toast.LENGTH_LONG).show();
+                            Log.i("receive time mark", "receiving successfully");
 
                             JSONObject jsonObject3 = new JSONObject();
                             jsonObject3.put("type", "3");
@@ -319,6 +321,7 @@ public class BluetoothInteract extends BaseActivity {
                         case "3":
                             //Notification: The message you sent to the other guy has been successfully received and saved
                             Toast.makeText(BluetoothInteract.this, "Send a device that needs help finding to a friend, friend has saved your devices", Toast.LENGTH_LONG).show();
+                            Log.i("send time mark", "sending successfully");
 
                             String mac = jsonObject.getString("mac");
                             List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", mac);

@@ -40,8 +40,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text=""
-                android:textColor="@color/white"
-                android:textSize="15sp" />
+                android:textColor="@color/design_default_color_error"
+                android:textSize="10sp" />
 
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
