@@ -95,6 +95,7 @@ public class APP extends Application {
     }
 
 
+    //Record the location of the phone when the device is found for the convenience of subsequent search for the owner
     public static Location getLastKnownLocation() {
         //Gets the location manager
         LocationManager mLocationManager = (LocationManager) APP.getInstance().getSystemService(LOCATION_SERVICE);
@@ -139,7 +140,4 @@ public class APP extends Application {
         super.onTerminate();
         SugarContext.terminate();
     }
-
-
-
 }

@@ -27,24 +27,6 @@ public class DeviceBean extends SugarRecord implements Serializable {
     public DeviceBean() {
     }
 
-    public DeviceBean(String name, String mac, String type, String btType, int rssi, int me, String userId, String userName, String messengerId, String messengerName, int find, String findTime, String longitude, String latitude, String findPlace) {
-        this.name = name;
-        this.mac = mac;
-        this.type = type;
-        this.btType = btType;
-        this.rssi = rssi;
-        this.me = me;
-        this.userId = userId;
-        this.userName = userName;
-        this.messengerId = messengerId;
-        this.messengerName = messengerName;
-        this.find = find;
-        this.findTime = findTime;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.findPlace = findPlace;
-    }
-
     public String getName() {
         return name;
     }

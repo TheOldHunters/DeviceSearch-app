@@ -334,7 +334,7 @@ public class FindActivity extends BaseActivity {
             if (!TextUtils.isEmpty(num))
                 tvNum.setText("scan times：" + num);
 
-            // find the device
+            // find the device, record the find time and find location of that device
             if ("detected".equals(status)){
                 deviceBean.setRssi(Integer.parseInt(rssi));
                 deviceBean.setFind(1);
