@@ -1,7 +1,4 @@
 # Anti-lost device searcher app--- _Find_
-## author: Hongjia Xue
-## student ID: 20216915
-## email: scyhx5@nottingham.ac.uk
 
 ##1. Software Introduction
 

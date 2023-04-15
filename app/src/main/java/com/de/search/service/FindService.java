@@ -37,7 +37,6 @@ public class FindService extends Service {
     private String name;
     private String mac;
 
-
     private FindBinder binder = new FindBinder();
 
     private RemoteViews remoteViews;
@@ -205,8 +204,8 @@ public class FindService extends Service {
                     int i = (int) (d * 100);
                     d = (float) i / 100;
 
+
                     sendData1(String.valueOf(d), String.valueOf(device.rssi), "detected");
-//                    scan();
                     find = true;
 
                     Log.e("", "find it");
