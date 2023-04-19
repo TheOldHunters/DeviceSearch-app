@@ -166,7 +166,7 @@ public class BluetoothInteract extends BaseActivity {
     }
 
     //Modify the visibility of native Bluetooth devices -> set visible
-    private void ensureDiscoverable() {
+    private void setVisble() {
         //After turning on the phone's Bluetooth, the time that it can be scanned by other Bluetooth devices is not permanent
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -244,7 +244,7 @@ public class BluetoothInteract extends BaseActivity {
                             //Send back devices you've already found for them
                             BluetoothInteract.this.sendMessage(jsonObject1.toJSONString());
 
-                            Toast.makeText(BluetoothInteract.this, "Send the device to help find to the other party", Toast.LENGTH_LONG).show();
+                            Toast.makeText(BluetoothInteract.this, "Send the items someone is looking for", Toast.LENGTH_LONG).show();
 
                             break;
 
@@ -269,7 +269,7 @@ public class BluetoothInteract extends BaseActivity {
                             addDevice(deviceBeans1);
 
 
-                            Toast.makeText(BluetoothInteract.this, "Received the equipment sent by the other party to help find it", Toast.LENGTH_LONG).show();
+                            Toast.makeText(BluetoothInteract.this, "Receiving items that other person found for me", Toast.LENGTH_LONG).show();
 
 
                             break;
@@ -303,11 +303,11 @@ public class BluetoothInteract extends BaseActivity {
 
                                     //Save it to my device
                                     deviceBean.save();
+                                    Log.i("receive time mark", "receiving successfully");
                                 }
                             }
 
                             Toast.makeText(BluetoothInteract.this, "Received the equipment sent by the other party to help find", Toast.LENGTH_LONG).show();
-                            Log.i("receive time mark", "receiving successfully");
 
                             JSONObject jsonObject3 = new JSONObject();
                             jsonObject3.put("type", "3");
@@ -321,7 +321,7 @@ public class BluetoothInteract extends BaseActivity {
                         case "3":
                             //Notification: The message you sent to the other guy has been successfully received and saved
                             Toast.makeText(BluetoothInteract.this, "Send a device that needs help finding to a friend, friend has saved your devices", Toast.LENGTH_LONG).show();
-                            Log.i("send time mark", "sending successfully");
+
 
                             String mac = jsonObject.getString("mac");
                             List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", mac);
@@ -396,6 +396,7 @@ public class BluetoothInteract extends BaseActivity {
 
                     //Send a friend a device you need help finding
                     BluetoothInteract.this.sendMessage(jsonObject1.toJSONString());
+                    Log.i("send time mark", "sending successfully");
 
                 } else {
                     Toast.makeText(BluetoothInteract.this, "No choice send device", Toast.LENGTH_SHORT).show();
@@ -524,7 +525,7 @@ public class BluetoothInteract extends BaseActivity {
                     startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                     return true;
                 case R.id.discoverable:
-                    ensureDiscoverable();
+                    setVisble();
                     return true;
                 case R.id.back:
                     startActivity(new Intent(BluetoothInteract.this, HomeActivity.class));

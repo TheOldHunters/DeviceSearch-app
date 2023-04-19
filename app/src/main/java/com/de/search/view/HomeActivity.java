@@ -318,10 +318,11 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(5000, 1) //Scan the BLE device once for 5s each time
-                    .searchBluetoothClassicDevice(5000) //Then scan the classic Bluetooth 5s
+                    .searchBluetoothLeDevice(4000, 1) //Scan the BLE device once for 4s each time
+                    .searchBluetoothClassicDevice(4000) //Then scan the classic Bluetooth 4s
                     .build();
         }
+
         APP.mClient.search(searchRequest, new SearchResponse() {
             @Override
             public void onSearchStarted() {

@@ -57,7 +57,7 @@ public class FindActivity extends BaseActivity {
     private String mac;
     private int type;
     private int btType;
-    
+
     private DeviceBean deviceBean;
 
     private boolean stop = false;
@@ -144,23 +144,41 @@ public class FindActivity extends BaseActivity {
         //button of 'Find it', click this the service of find will be stopped
         bt.setOnClickListener(view -> {
 
-            if (!stop){
+            if (!stop) {
                 unbindService(connection);
                 unregisterReceiver(broadcastReceiver);
                 stopService(sIntent);
                 APP.isFind = false;
 
                 stop = true;
+
+                tvStatus.setText("status：detected");
+
+//                if (TextUtils.isEmpty(deviceBean.getDistance())){
+//                    deviceBean.setDistance("0");
+//                }
+
+                deviceBean.setFind(1);
+                deviceBean.setFindTime(APP.formatter.format(new Date(System.currentTimeMillis()))); //record the time while finding
+                if (APP.location != null) {
+                    deviceBean.setLongitude(APP.location.getLongitude() + "");
+                    deviceBean.setLatitude(APP.location.getLatitude() + "");
+                }
+
+                deviceBean.save();
+
+                startToActivity(HomeActivity.class);
+                finish();
             }
 
         });
 
         //'Detail' button inside the device's information, click this the rssi and mac info will be displayed
         tvDetail.setOnClickListener(view -> {
-            if (tvMac.getVisibility() == View.GONE){
+            if (tvMac.getVisibility() == View.GONE) {
                 tvMac.setVisibility(View.VISIBLE);
                 tvRssi.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 tvMac.setVisibility(View.GONE);
                 tvRssi.setVisibility(View.GONE);
             }
@@ -175,7 +193,7 @@ public class FindActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        if (!stop){
+        if (!stop) {
             unbindService(connection);
             unregisterReceiver(broadcastReceiver);
             stopService(sIntent);
@@ -202,7 +220,7 @@ public class FindActivity extends BaseActivity {
                 UpdateGPSPin();
                 updateMarker();
 
-                if (!TextUtils.isEmpty(deviceBean.getLatitude()) && !TextUtils.isEmpty(deviceBean.getLongitude())){
+                if (!TextUtils.isEmpty(deviceBean.getLatitude()) && !TextUtils.isEmpty(deviceBean.getLongitude())) {
                     List<DeviceBean> deviceBeans = new ArrayList<>();
                     deviceBeans.add(deviceBean);
                     addDevice(deviceBeans);
@@ -251,7 +269,7 @@ public class FindActivity extends BaseActivity {
 
         // set the center location and zoom level of map
         Coordinate coordinate = _GPSManager.GetCoordinate();
-        bingMapsView.setCenterAndZoom(coordinate,15);
+        bingMapsView.setCenterAndZoom(coordinate, 15);
 
         // Polyline used to draw lines on the MapView
         // PolylineOptions have multiple attributes for the line
@@ -264,7 +282,7 @@ public class FindActivity extends BaseActivity {
         entityLayer.add(routeLine);
     }
 
-    private void addDevice(List<DeviceBean> deviceBeans){
+    private void addDevice(List<DeviceBean> deviceBeans) {
         EntityLayer entityLayer = (EntityLayer) bingMapsView.getLayerManager()
                 .getLayerByName(Constants.DataLayers.Search);
         if (entityLayer == null) {
@@ -272,7 +290,7 @@ public class FindActivity extends BaseActivity {
         }
         entityLayer.clear();
 
-        for (int i = 0; i < deviceBeans.size(); i++){
+        for (int i = 0; i < deviceBeans.size(); i++) {
             double longitude = Double.parseDouble(deviceBeans.get(i).getLongitude());
             double latitude = Double.parseDouble(deviceBeans.get(i).getLatitude());
 
@@ -335,18 +353,19 @@ public class FindActivity extends BaseActivity {
                 tvNum.setText("scan times：" + num);
 
             // find the device, record the find time and find location of that device
-            if ("detected".equals(status)){
+            if ("detected".equals(status)) {
                 deviceBean.setRssi(Integer.parseInt(rssi));
                 deviceBean.setFind(1);
                 deviceBean.setFindTime(APP.formatter.format(new Date(System.currentTimeMillis()))); //record the time while finding
-                if (APP.location != null){
-                    deviceBean.setLongitude(APP.location.getLongitude()+"");
-                    deviceBean.setLatitude(APP.location.getLatitude()+"");
+                deviceBean.setDistance(distance);
+                if (APP.location != null) {
+                    deviceBean.setLongitude(APP.location.getLongitude() + "");
+                    deviceBean.setLatitude(APP.location.getLatitude() + "");
                 }
 
                 deviceBean.save();
 
-                if (!TextUtils.isEmpty(deviceBean.getLatitude()) && !TextUtils.isEmpty(deviceBean.getLongitude())){
+                if (!TextUtils.isEmpty(deviceBean.getLatitude()) && !TextUtils.isEmpty(deviceBean.getLongitude())) {
                     // mark the location while finding
                     //Since the device to be found at this time should be near the phone
                     //thus the geographical location of the phone at this time is the approximate location of the device to be found

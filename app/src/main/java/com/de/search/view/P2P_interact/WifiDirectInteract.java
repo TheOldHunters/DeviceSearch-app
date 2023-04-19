@@ -250,7 +250,7 @@ public class WifiDirectInteract extends BaseActivity {
                             //Send back devices you've already found for them
                             WifiDirectInteract.this.sendMessage(jsonObject1.toJSONString());
 
-                            Toast.makeText(WifiDirectInteract.this, "Send the device to help find to the other party", Toast.LENGTH_LONG).show();
+                            Toast.makeText(WifiDirectInteract.this, "Send the items someone is looking for", Toast.LENGTH_LONG).show();
 
                             break;
                         case "1":
@@ -275,7 +275,7 @@ public class WifiDirectInteract extends BaseActivity {
                             addDevice(deviceBeans1);
 
 
-                            Toast.makeText(WifiDirectInteract.this, "Received the equipment sent by the other party to help find it", Toast.LENGTH_LONG).show();
+                            Toast.makeText(WifiDirectInteract.this, "Receiving items that other person found for me", Toast.LENGTH_LONG).show();
 
 
 
@@ -296,11 +296,11 @@ public class WifiDirectInteract extends BaseActivity {
 
                                     // Save it to my device
                                     deviceBean.save();
+                                    Log.i("receive time mark", "receiving successfully");
                                 }
                             }
 
                             Toast.makeText(WifiDirectInteract.this, "Received the equipment sent by the other party to help find", Toast.LENGTH_LONG).show();
-                            Log.i("receive time mark", "receiving successfully");
 
                             JSONObject jsonObject3 = new JSONObject();
                             jsonObject3.put("type", "3");
@@ -313,7 +313,6 @@ public class WifiDirectInteract extends BaseActivity {
                             break;
                         case "3":
                             Toast.makeText(WifiDirectInteract.this, "Send a device that needs help finding to a friend, friend has saved your devices", Toast.LENGTH_LONG).show();
-                            Log.i("send time mark", "sending successfully");
 
                             String mac = jsonObject.getString("mac");
                             List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "name = ?", mac);
@@ -402,6 +401,7 @@ public class WifiDirectInteract extends BaseActivity {
 
                     //Send a friend a device you need help finding
                     WifiDirectInteract.this.sendMessage(jsonObject1.toJSONString());
+                    Log.i("send time mark", "sending successfully");
 
                 } else {
                     Toast.makeText(WifiDirectInteract.this, "No choice send device", Toast.LENGTH_SHORT).show();

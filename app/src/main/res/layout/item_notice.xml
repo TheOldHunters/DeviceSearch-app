@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="20dp"
@@ -26,6 +27,7 @@
             android:layout_marginLeft="10dp"
             android:textSize="13sp"
             />
+
 
     </LinearLayout>
 

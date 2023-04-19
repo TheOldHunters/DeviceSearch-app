@@ -12,6 +12,7 @@ import android.media.AudioAttributes;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -21,11 +22,14 @@ import androidx.core.app.NotificationCompat;
 
 import com.de.search.R;
 import com.de.search.app.APP;
+import com.de.search.util.RssiAlgorithm;
 import com.de.search.view.FindActivity;
 import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
+
+import java.text.DecimalFormat;
 
 //This is the core code of Bluetooth search function of this app, which realizes dual-mode ble and bt search function by importing inuker bluetoothkit library
 //https://github.com/dingjikerbo/Android-BluetoothKit
@@ -40,7 +44,8 @@ public class FindService extends Service {
     private FindBinder binder = new FindBinder();
 
     private RemoteViews remoteViews;
-
+    private Vibrator vibrator;
+    private long[] pattern = {100, 200, 100, 200};
 
     private AudioAttributes audioAttributes;
     private NotificationManager notificationManager;
@@ -94,6 +99,7 @@ public class FindService extends Service {
     public void onCreate() {
         System.out.println("onCreate invoke");
         APP.isFind = true;
+        vibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
         audioAttributes = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_ALARM) // isAlarm judgment in the source code can be passed
@@ -177,8 +183,8 @@ public class FindService extends Service {
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(5000, 1) // Scan the BLE device once for 5s each time
-                    .searchBluetoothClassicDevice(5000) // Then scan the classic Bluetooth 5s
+                    .searchBluetoothLeDevice(1000, 1) // Scan the BLE device once for 1s each time
+                    .searchBluetoothClassicDevice(1000) // Then scan the classic Bluetooth 1s
                     .build();
         }
         APP.mClient.search(searchRequest, new SearchResponse() {
@@ -200,12 +206,32 @@ public class FindService extends Service {
                 }
 
                 if (bluetoothDevice.getAddress().equals(mac)) {
-                    float d = (float) Math.pow(10, ((Math.abs(device.rssi) - 60) / (10 * 2.0f))); //rssi distance function
-                    int i = (int) (d * 100);
-                    d = (float) i / 100;
+                    float d = 0;
+
+                    switch (APP.algorithm){
+                        case 0:
+                            d = RssiAlgorithm.calculateDistance1(device.rssi);
+                            break;
+                        case 1:
+                            d = RssiAlgorithm.calculateDistance2(device.rssi);
+                            break;
+                        case 2:
+                            d = RssiAlgorithm.calculateDistance3(device.rssi);
+                            break;
+                    }
+                    DecimalFormat df = new DecimalFormat("0.000"); //Accurate to three decimal places
+                    d = Float.parseFloat(df.format(d));
+
+                    APP.location = APP.getLastKnownLocation();
+
+                    if (APP.getDistance() >= d){
+                        sendData1(String.valueOf(d), String.valueOf(device.rssi), "detected");
+                        //Vibrations
+                    }else {
+                        sendData1(String.valueOf(d), String.valueOf(device.rssi), "not detected");
+                    }
 
 
-                    sendData1(String.valueOf(d), String.valueOf(device.rssi), "detected");
                     find = true;
 
                     Log.e("", "find it");
@@ -243,9 +269,16 @@ public class FindService extends Service {
             return;
         }
 
-        if (status.equals("detected")) {
-            APP.location = APP.getLastKnownLocation();
+        if (!TextUtils.isEmpty(distance) && APP.distance >= Float.parseFloat(distance)){
+            if (APP.isOpenVibrator()){
+                vibrator.vibrate(pattern, -1, audioAttributes);
+            }
+
         }
+
+//        if (status.equals("detected")) {
+//            APP.location = APP.getLastKnownLocation();
+//        }
 
         if (!TextUtils.isEmpty(distance))
             remoteViews.setTextViewText(R.id.tv_distance, "distance(m)：" + distance);

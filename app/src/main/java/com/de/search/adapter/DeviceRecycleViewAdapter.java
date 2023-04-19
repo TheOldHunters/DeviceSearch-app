@@ -62,10 +62,11 @@ public class DeviceRecycleViewAdapter extends RecyclerView.Adapter<DeviceRecycle
         }
 
         if (deviceBean.getFind() == 1){
-            float d = (float) Math.pow(10, ((Math.abs(deviceBean.getRssi()) - 60) / (10 * 2.0f)));
-            int i = (int) (d * 100);
-            d = (float) i / 100;
-            holder.textDistance.setText("distance(m)：" + d);
+//            float d = (float) Math.pow(10, ((Math.abs(deviceBean.getRssi()) - 60) / (10 * 2.0f)));
+//            int i = (int) (d * 100);
+//            d = (float) i / 100;
+//            holder.textDistance.setText("distance(m)：" + d);
+            holder.textDistance.setText("distance(m)：" + deviceBean.getDistance());
         }
 
 

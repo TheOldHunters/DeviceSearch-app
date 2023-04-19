@@ -1,6 +1,5 @@
 package com.de.search.view;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;

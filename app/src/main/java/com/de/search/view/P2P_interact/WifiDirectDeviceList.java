@@ -142,12 +142,12 @@ public class WifiDirectDeviceList extends BaseActivity {
 
         mManager = (WifiP2pManager) getSystemService(WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
-        
+
         SocketHandler.setmManager(mManager);
         SocketHandler.setmChannel(mChannel);
 
         set();
-        
+
         mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
 
         //device list
@@ -261,7 +261,7 @@ public class WifiDirectDeviceList extends BaseActivity {
             @Override
             public void onSuccess() {
                 num = 0;
-                Toast.makeText(getApplicationContext(), "Connected to "+device.deviceName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Connecting to "+device.deviceName, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -269,7 +269,7 @@ public class WifiDirectDeviceList extends BaseActivity {
                 num = num + 1;
                 if (num >= 3){
                     Log.e("11111", "<<<<<<<<<<<<<<<<");
-                    Toast.makeText(getApplicationContext(), "Error in connecting to "+device.deviceName + ":\n Click Connect after searching for friends again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error in connecting to "+device.deviceName + ":\n Please try again when both sides find each other", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -418,9 +418,21 @@ public class WifiDirectDeviceList extends BaseActivity {
                 socket.connect(new InetSocketAddress(hostAddress, PORT), 1000);
                 SocketHandler.setSocket(socket);
                 SocketHandler.setType(1);
+
+                go();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        void go(){
+            Intent intent = new Intent();
+
+            intent.putExtra(DEVICE_NAME, customPeers.get(select).deviceName);
+
+            setResult(Activity.RESULT_OK, intent);
+
+            finish();
         }
 
     }

@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.provider.Settings;
 import android.text.TextUtils;
 
 import androidx.core.content.ContextCompat;
@@ -32,8 +31,11 @@ public class APP extends Application {
     public static int distance = 1; // Reminder distance
     public static int bluetoothType = 1; // 0: Bluetooth low power, 1: Bluetooth classic
     public static String pin = "";
+    public static int algorithm = 0;
 
     public static boolean isFind = false;
+
+    private static boolean openVibrator;
 
     public static BluetoothClient mClient;
 
@@ -55,9 +57,11 @@ public class APP extends Application {
         mClient = new BluetoothClient(this);
 
         type = (int) LocalStorageUtils.getParam(this, "type", 0);
+        algorithm = (int) LocalStorageUtils.getParam(this, "algorithm", 0);
         distance = (int) LocalStorageUtils.getParam(this, "distance", 1);
         bluetoothType = (int) LocalStorageUtils.getParam(this, "bluetoothType", 1);
         pin = (String) LocalStorageUtils.getParam(this, "pin", "");
+        openVibrator = (boolean) LocalStorageUtils.getParam(this, "openVibrator", true);
 
         SugarContext.init(this);
 
@@ -94,6 +98,13 @@ public class APP extends Application {
         return bluetoothAdapter.getName();
     }
 
+    public static boolean isOpenVibrator() {
+        return openVibrator;
+    }
+
+    public static void setOpenVibrator(boolean openVibrator) {
+        APP.openVibrator = openVibrator;
+    }
 
     //Record the location of the phone when the device is found for the convenience of subsequent search for the owner
     public static Location getLastKnownLocation() {

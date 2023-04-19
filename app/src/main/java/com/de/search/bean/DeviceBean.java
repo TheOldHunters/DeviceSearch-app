@@ -21,6 +21,7 @@ public class DeviceBean extends SugarRecord implements Serializable {
     private String longitude = "";   // longitude
     private String latitude = "";   // latitude
     private String findPlace = "";   // location
+    private String distance = "0";
 
     private boolean c;
 
@@ -155,5 +156,13 @@ public class DeviceBean extends SugarRecord implements Serializable {
 
     public void setC(boolean c) {
         this.c = c;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 }
