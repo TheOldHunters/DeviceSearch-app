@@ -36,8 +36,8 @@ public class RssiAlgorithm {
 
 
     //3. Recursive Moving Average Filter
-    private static final int QUEUE_SIZE = 10; // 队列长度
-    private static final Queue<Double> rssiQueue = new LinkedList<>(); // 存储最近N个RSSI值的队列
+    private static final int QUEUE_SIZE = 10; // Queue length
+    private static final Queue<Double> rssiQueue = new LinkedList<>(); // Queue for storing the last N RSSI values
 
     /**
      * Estimation of distances using the recursive mean filtering algorithm
