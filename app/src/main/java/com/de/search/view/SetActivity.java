@@ -22,7 +22,7 @@ import java.util.List;
 public class SetActivity extends BaseActivity {
 
 
-    private EditText et1, et2;
+    private EditText et1, et2, etTime;
     private Button bt1;
     private TextView tvBack;
     private Switch sVibration;
@@ -45,6 +45,7 @@ public class SetActivity extends BaseActivity {
 
         et1 = findViewById(R.id.et1);
         et2 = findViewById(R.id.et2);
+        etTime = findViewById(R.id.et_time);
         bt1 = findViewById(R.id.bt1);
 
         tvBack = findViewById(R.id.tv_back);
@@ -59,6 +60,7 @@ public class SetActivity extends BaseActivity {
 
         et1.setText(String.valueOf(APP.getDistance()));
         et2.setText(String.valueOf(APP.getPin()));
+        etTime.setText(String.valueOf(APP.time));
 
         sVibration.setChecked(APP.isOpenVibrator());
 
@@ -102,7 +104,9 @@ public class SetActivity extends BaseActivity {
             APP.setOpenVibrator(sVibration.isChecked());
             APP.setPin(et2.getText().toString());
             APP.algorithm = sAlgorithm.getSelectedItemPosition();
+            APP.time = Integer.parseInt(etTime.getText().toString());
             LocalStorageUtils.setParam(SetActivity.this, "distance", APP.getDistance());
+            LocalStorageUtils.setParam(SetActivity.this, "time", APP.time);
             LocalStorageUtils.setParam(SetActivity.this, "pin", APP.getPin());
             LocalStorageUtils.setParam(SetActivity.this, "openVibrator", sVibration.isChecked());
             LocalStorageUtils.setParam(SetActivity.this, "algorithm", sAlgorithm.getSelectedItemPosition());

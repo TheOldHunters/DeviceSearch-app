@@ -29,6 +29,7 @@ public class APP extends Application {
 
     public static int type = 0; // 0: Bluetooth, 1: wifi, 2: wifip2p
     public static int distance = 1; // Reminder distance
+    public static int time = 5; // scan times
     public static int bluetoothType = 1; // 0: Bluetooth low power, 1: Bluetooth classic
     public static String pin = "";
     public static int algorithm = 0;
@@ -59,6 +60,7 @@ public class APP extends Application {
         type = (int) LocalStorageUtils.getParam(this, "type", 0);
         algorithm = (int) LocalStorageUtils.getParam(this, "algorithm", 0);
         distance = (int) LocalStorageUtils.getParam(this, "distance", 1);
+        time = (int) LocalStorageUtils.getParam(this, "time", 5);
         bluetoothType = (int) LocalStorageUtils.getParam(this, "bluetoothType", 1);
         pin = (String) LocalStorageUtils.getParam(this, "pin", "");
         openVibrator = (boolean) LocalStorageUtils.getParam(this, "openVibrator", true);

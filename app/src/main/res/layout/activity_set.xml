@@ -90,6 +90,29 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="scan per second(s)：" />
+
+            <EditText
+                android:id="@+id/et_time"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:background="@drawable/com_edi_bg"
+                android:digits="1234567890"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Turn on vibration："/>
 
             <Switch

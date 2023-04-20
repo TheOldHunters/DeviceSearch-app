@@ -44,7 +44,7 @@ public class BluetoothInteractService {
         public ReceiveThread() {
             BluetoothServerSocket tmp = null;
             try {
-                //Use RF comm to listen
+                //Use RF comm to listen and the standard UUID is used
                 tmp = APP.getBluetoothAdapter().listenUsingRfcommWithServiceRecord("BluetoothInteract", UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66"));
             } catch (IOException e) {
             }

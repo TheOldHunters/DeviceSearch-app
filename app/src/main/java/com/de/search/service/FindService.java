@@ -183,8 +183,8 @@ public class FindService extends Service {
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(1000, 1) // Scan the BLE device once for 1s each time
-                    .searchBluetoothClassicDevice(1000) // Then scan the classic Bluetooth 1s
+                    .searchBluetoothLeDevice(APP.time * 1000, 1) // Scan the BLE device once for 1s each time
+                    .searchBluetoothClassicDevice(APP.time * 1000) // Then scan the classic Bluetooth 1s
                     .build();
         }
         APP.mClient.search(searchRequest, new SearchResponse() {
