@@ -6,8 +6,11 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -41,6 +44,8 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
     private SwipeRefreshLayout swipe;
 
     private LinearLayout l1, l2, l3, l4;
+
+    private EditText et1;
 
     private RecyclerView mRecycleView;
     private DeviceRecycleViewAdapter mAdapter;//adapter
@@ -89,6 +94,7 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
         l2 = findViewById(R.id.ll2);
         l3 = findViewById(R.id.ll3);
         l4 = findViewById(R.id.ll4);
+        et1 = findViewById(R.id.et1);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         //Create options menu
@@ -213,6 +219,27 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
     @Override
     protected void initListener() {
+
+        et1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String str = editable.toString();
+
+                deviceBeanList.clear();
+                deviceBeanList.addAll(DeviceBean.find(DeviceBean.class, "name like ?", "%" + str +  "%"));
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
         //l1 is the 'BT' button in the below toolbar, click this will jump to BT interact function, which belong to BluetoothInteract.class
         l1.setOnClickListener(view -> {

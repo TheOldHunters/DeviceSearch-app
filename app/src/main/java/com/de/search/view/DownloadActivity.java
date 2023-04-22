@@ -32,6 +32,11 @@ public class DownloadActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
+    }
 
+    @Override
+    public void onBackPressed() {
+        startToActivity(HomeActivity.class);
+        finish();
     }
 }
