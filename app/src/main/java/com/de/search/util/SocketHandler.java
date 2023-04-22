@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 //It is used to process the information transmission between two mobile phones in wifi-p2p mode
+//This class provides functions for handling Socket connections, ServerSockets, P2P groups and closing connections.
 
 public class SocketHandler {
     private static WifiP2pManager mManager;
@@ -59,6 +60,8 @@ public class SocketHandler {
         SocketHandler.mChannel = mChannel;
     }
 
+    //Used to close socket and serverSocket connections.
+    //It will call the closeP2p() method to close the P2P group before closing the connection.
     public static synchronized void closeSocket(){
 
         closeP2p();

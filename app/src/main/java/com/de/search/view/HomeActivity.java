@@ -40,7 +40,7 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
     private TextView tvSet, tvName, tvInfo;
     private SwipeRefreshLayout swipe;
 
-    private LinearLayout l1, l2, l3;
+    private LinearLayout l1, l2, l3, l4;
 
     private RecyclerView mRecycleView;
     private DeviceRecycleViewAdapter mAdapter;//adapter
@@ -88,6 +88,7 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
         l1 = findViewById(R.id.ll1);
         l2 = findViewById(R.id.ll2);
         l3 = findViewById(R.id.ll3);
+        l4 = findViewById(R.id.ll4);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         //Create options menu
@@ -231,6 +232,12 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
         l3.setOnClickListener(view -> {
             APP.mClient.stopSearch();
             startToActivity(IntroductionActivity.class);
+            finish();
+        });
+
+        l4.setOnClickListener(view -> {
+            APP.mClient.stopSearch();
+            startToActivity(DownloadActivity.class);
             finish();
         });
 

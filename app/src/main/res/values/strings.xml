@@ -3,7 +3,7 @@
 
 
     <string name="notifyTitle">Tips</string>
-    <string name="notifyMsg">Authorization is required, please authorize, location information needs to be allowed at all times</string>
+    <string name="notifyMsg">Authorization is required, please authorize the all-times location and Nearby devices permission</string>
     <string name="setting">authorize</string>
 
     <string name="cancel">cancel</string>
