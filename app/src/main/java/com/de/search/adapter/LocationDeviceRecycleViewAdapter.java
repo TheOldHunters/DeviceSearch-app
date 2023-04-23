@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.de.search.R;
-import com.de.search.bean.DeviceBean;
 import com.de.search.bean.DeviceLocationBean;
 
 import java.util.ArrayList;

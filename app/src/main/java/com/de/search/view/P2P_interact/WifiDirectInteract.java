@@ -204,7 +204,7 @@ public class WifiDirectInteract extends BaseActivity {
 
     //Use the Handler object to pass messages between the main UI thread and its child threads
     @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler() {   //消息处理
+    private final Handler mHandler = new Handler() {   //Message processing
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
