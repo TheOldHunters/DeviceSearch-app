@@ -75,6 +75,8 @@ public class BluetoothInteract extends BaseActivity {
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int SELECT_BT = 3;
 
+    private String receiveData = "";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -229,8 +231,19 @@ public class BluetoothInteract extends BaseActivity {
                     //Received data
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
+
+                    receiveData = receiveData + readMessage;
                     //Data analysis
-                    JSONObject jsonObject = JSONObject.parseObject(readMessage);
+                    JSONObject jsonObject;
+
+                    try {
+                        jsonObject = JSONObject.parseObject(receiveData);
+                    }catch (Exception e){
+                        return;
+                    }
+
+                    receiveData = "";
+
                     String type = jsonObject.getString("type");
                     String id = jsonObject.getString("id");
                     switch (type) {

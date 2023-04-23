@@ -3,6 +3,7 @@ package com.de.search.view;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -25,13 +26,17 @@ import com.de.search.adapter.DeviceRecycleViewAdapter;
 import com.de.search.app.APP;
 import com.de.search.base.BaseActivity;
 import com.de.search.bean.DeviceBean;
+import com.de.search.bean.DeviceLocationBean;
+import com.de.search.util.RssiAlgorithm;
 import com.de.search.view.BT_interact.BluetoothInteract;
 import com.de.search.view.P2P_interact.WifiDirectInteract;
 import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.orm.query.Select;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -151,6 +156,13 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
                         thread.interrupt();
                         thread = null;
                     }
+
+                    return true;
+
+                case R.id.location:
+                    APP.mClient.stopSearch();
+                    startToActivity(TriangulationActivity.class);
+                    finish();
 
                     return true;
 
@@ -306,9 +318,9 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
     public void onLongClick(int position) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 //title
-                .setTitle("Delete device")
+                .setTitle("Delete device or Save its data")
                 //content
-                .setMessage("Delete " + deviceBeanList.get(position).getName() + " to my device")
+                .setMessage("Delete or Save " + deviceBeanList.get(position).getName() + "'s data to do Trilateral positioning")
                 //icon
                 .setIcon(R.mipmap.ic_launcher)
                 .setPositiveButton("Delete", (dialogInterface, i) -> {
@@ -321,7 +333,38 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
                     }
 
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (deviceBeanList.get(position).getFind() == 0){
+                            showToast("save fail, Device not found");
+                            return;
+                        }
+
+                        if (deviceBeanList.get(position).getRssi() == 0){
+                            showToast("save fail, rssi is 0");
+                            return;
+                        }
+
+                        List<DeviceLocationBean> deviceLocationBeanList = DeviceLocationBean.find(DeviceLocationBean.class, "mac = ? and find_time = ?", deviceBeanList.get(position).getMac(), deviceBeanList.get(position).getFindTime());
+                        if (deviceLocationBeanList.size() > 0){
+                            showToast("save fail, Device already exists");
+                            return;
+                        }
+
+
+                        DeviceLocationBean deviceLocationBean = new DeviceLocationBean();
+                        deviceLocationBean.setRssi(deviceBeanList.get(position).getRssi());
+                        deviceLocationBean.setName(deviceBeanList.get(position).getName());
+                        deviceLocationBean.setMac(deviceBeanList.get(position).getMac());
+                        deviceLocationBean.setFindTime(deviceBeanList.get(position).getFindTime());
+                        deviceLocationBean.setLatitude(deviceBeanList.get(position).getLatitude());
+                        deviceLocationBean.setLongitude(deviceBeanList.get(position).getLongitude());
+                        deviceLocationBean.setSaveTime(APP.formatter.format(new Date(System.currentTimeMillis())));
+                        deviceLocationBean.save();
+                        showToast("Successfully saved");
+                    }
+                })
                 .create();
         alertDialog.show();
     }
@@ -352,8 +395,8 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(4000, 1) //Scan the BLE device once for 4s each time
-                    .searchBluetoothClassicDevice(4000) //Then scan the classic Bluetooth 4s
+                    .searchBluetoothLeDevice(APP.time * 1000, 1) //Scan the BLE device once for 4s each time
+                    .searchBluetoothClassicDevice(APP.time * 1000) //Then scan the classic Bluetooth 4s
                     .build();
         }
 
@@ -388,6 +431,22 @@ public class HomeActivity extends BaseActivity implements DeviceRecycleViewAdapt
                             deviceBeanList.get(i).setLongitude(location.getLongitude() + "");
                             deviceBeanList.get(i).setLatitude(location.getLatitude() + "");
                         }
+
+                        float d = 0;
+
+                        switch (APP.algorithm){
+                            case 0:
+                                d = RssiAlgorithm.calculateDistance1(device.rssi);
+                                break;
+                            case 1:
+                                d = RssiAlgorithm.calculateDistance2(device.rssi);
+                                break;
+                            case 2:
+                                d = RssiAlgorithm.calculateDistance3(device.rssi);
+                                break;
+                        }
+                        DecimalFormat df = new DecimalFormat("0.000"); //Accurate to three decimal places
+                        deviceBeanList.get(i).setDistance(df.format(d));
 
                         deviceBeanList.get(i).save();
                         mAdapter.notifyDataSetChanged();

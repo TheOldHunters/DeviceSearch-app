@@ -62,11 +62,9 @@ public class VerifyActivity extends BaseActivity {
         pin = (String) LocalStorageUtils.getParam(this, "pin", "");
 
         if (TextUtils.isEmpty(pin)) {
-            showToast("未设PIN");
+            showToast("PIN not set yet");
             openDialog();
         }
-
-
     }
 
     @Override

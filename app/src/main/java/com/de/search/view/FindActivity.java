@@ -63,6 +63,7 @@ public class FindActivity extends BaseActivity {
     private boolean stop = false;
 
 
+
     private Intent sIntent;
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -154,9 +155,6 @@ public class FindActivity extends BaseActivity {
 
                 tvStatus.setText("status：detected");
 
-//                if (TextUtils.isEmpty(deviceBean.getDistance())){
-//                    deviceBean.setDistance("0");
-//                }
 
                 deviceBean.setFind(1);
                 deviceBean.setFindTime(APP.formatter.format(new Date(System.currentTimeMillis()))); //record the time while finding
@@ -343,10 +341,16 @@ public class FindActivity extends BaseActivity {
             String status = intent.getStringExtra("status");
             String num = intent.getStringExtra("num");
 
-            if (!TextUtils.isEmpty(distance))
+            if (!TextUtils.isEmpty(distance)){
+                deviceBean.setDistance(distance);
                 tvDistance.setText("distance(m)：" + distance);
-            if (!TextUtils.isEmpty(rssi))
+            }
+
+            if (!TextUtils.isEmpty(rssi)){
+                deviceBean.setRssi(Integer.parseInt(rssi));
                 tvRssi.setText("rssi：" + rssi);
+            }
+
             if (!TextUtils.isEmpty(status))
                 tvStatus.setText("status：" + status);
             if (!TextUtils.isEmpty(num))

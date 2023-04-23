@@ -5,10 +5,14 @@
         android:title="Add Device" />
     <item android:id="@+id/open"
         android:icon="@android:drawable/ic_menu_view"
-        android:title="Open Search" />
+        android:title="Open global Search" />
     <item android:id="@+id/close"
         android:icon="@android:drawable/ic_menu_view"
-        android:title="Close Search" />
+        android:title="Close global Search" />
+
+    <item android:id="@+id/location"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="triangulation positioning(test)" />
     
 
 </menu>

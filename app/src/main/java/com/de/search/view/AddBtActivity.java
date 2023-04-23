@@ -100,17 +100,17 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
         }).start());
 
-        //创建布局管理器，垂直设置LinearLayoutManager.VERTICAL，水平设置LinearLayoutManager.HORIZONTAL
+        //Create a layout manager, set LinearLayoutManager.VERTICAL vertically and LinearLayoutManager.HORIZONTAL horizontally
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        //创建适配器，将数据传递给适配器
+        //Creating adapters and passing data to them
         mAdapter = new AddDeviceRecycleViewAdapter(deviceBeanList, this);
-        //设置布局管理器
+        //Setting up the layout manager
         mRecycleView.setLayoutManager(mLinearLayoutManager);
-        //设置适配器adapter
+        //Setting up the adapter
         mRecycleView.setAdapter(mAdapter);
 
 
-        // 开启蓝牙扫描
+        // Turn on Bluetooth scanning
         APP.mClient.registerBluetoothStateListener(mBluetoothStateListener);
 
         if (APP.mClient.isBluetoothOpened()) {
@@ -152,11 +152,11 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setView(inputServer)
-                //标题
+                //Title
                 .setTitle("Add device")
-                //内容
+                //Contents
                 .setMessage("Add " + deviceBeanList.get(position).getName() + " to my device")
-                //图标
+                //Icons
                 .setIcon(R.mipmap.ic_launcher)
                 .setPositiveButton("confirm", new DialogInterface.OnClickListener() {
                     @SuppressLint("MissingPermission")
@@ -202,7 +202,6 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         startToActivity(HomeActivity.class);
         finish();
     }
@@ -225,8 +224,8 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
         if (searchRequest == null) {
             searchRequest = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(5000, 1) // 先扫 BLE 设备 1 次，每次 5s
-                    .searchBluetoothClassicDevice(5000) // 再扫经典蓝牙 5s
+                    .searchBluetoothLeDevice(5000, 1) // 1 sweep of the BLE device for 5s each
+                    .searchBluetoothClassicDevice(5000) // Re-sweep Classic Bluetooth 5s
                     .build();
         }
         APP.mClient.search(searchRequest, new SearchResponse() {
