@@ -7,7 +7,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:background="@color/teal_200"/>
+        android:background="@color/teal_200">
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/home_title"
@@ -45,11 +47,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ListView android:id="@+id/paired_devices"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="9"/>
 
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="If can't connet for a long time , try to close and re-open WIFI on the phone" />
+
+        <ListView
+            android:id="@+id/paired_devices"
+            android:layout_width="match_parent"
+            android:layout_height="466dp"
+            android:layout_weight="9" />
 
         <Button android:id="@+id/button_scan"
             android:layout_width="match_parent"
