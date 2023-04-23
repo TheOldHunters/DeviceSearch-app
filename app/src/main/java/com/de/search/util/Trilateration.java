@@ -54,6 +54,8 @@ public class Trilateration {
 
                 RealMatrix jacobian = new Array2DRowRealMatrix(3, 3);
                 // Calculating the Jacobi matrix
+                //The purpose of calculating the Jacobi matrix is to provide a local linear approximation about the position during the optimisation process.
+                //In this way, we can better understand how the function changes with position, thus helping us to find the position that minimises the error.
                 double[] derivatives1 = computeDerivatives(lat1, lon1, point);
                 double[] derivatives2 = computeDerivatives(lat2, lon2, point);
                 double[] derivatives3 = computeDerivatives(lat3, lon3, point);
@@ -67,6 +69,8 @@ public class Trilateration {
         };
 
 // Optimisation using the Levenberg-Marquardt algorithm
+        //In optimisation methods such as the Levenberg-Marquardt algorithm, the Jacobi matrix is used as an approximation to the gradient and is used to guide the algorithm in its search along the direction of the gradient.
+        //This helps the algorithm to converge to the correct solution, thus improving the accuracy of calculating the position of the unknown object.
         LeastSquaresOptimizer optimizer = new LevenbergMarquardtOptimizer();
         LeastSquaresOptimizer.Optimum optimum = optimizer.optimize(
                 new LeastSquaresBuilder()
