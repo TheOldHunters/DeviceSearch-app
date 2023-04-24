@@ -5,11 +5,13 @@
 This app is a peer-to-peer single-hop communication application based on Bluetooth and WIFI direct implementation.It combines Bluetooth BLE and traditional Bluetooth scanning, RSSI ranging and many other features to achieve a more innovative Android anti-loss application<br><br>
 the `compileSdkVersion` and `targetSdkVersion` is 32 in this project. And projects can only be run when connected to a real phone, as Android Studio's virtual machine does not have Bluetooth or WIFI capabilities. In addition, the running phone Android version is `Android 12.`<br><br>
 In addition, each class is given very detailed comments, especially the core functional classes, which can be read in conjunction with my thesis to understand my project<br><br>
+Note that to successfully access the app, `Location Permission` and `Nearby Device Permission` must be enabled and Location Permission must be `All Time Allowed`, otherwise you may not be able to access the app properly.
 ##2. Function Introduction
 This app is an item search and anti-lost app mainly based on Bluetooth and Wi-Fi direct technology. It can not only be used for simple item search, save, and locate functions, but also use peer-to-peer communication to connect different mobile phones in series.
 That is to say, you can connect another friend who has downloaded this app and transmit the device information you want to find to your friend through Bluetooth or Wi-Fi direct technology.
 <br>
 <br>
+
 This means in this decentralized network, you can act as a central node to spread your search information, thereby greatly increasing the probability of finding your lost device. At the same time, when your friend passes by the device you are looking for intentionally or unintentionally, the mobile phone will record the GPS address of the mobile phone when it was found at that time and transmit the location information and the found time to you the next time when your friend connects with you, thus realizing the anti-lost and search functions
 ##3. Detailed usage method
 There are also some caveats before you can officially use it, for example, you need to turn on the get address and nearby devices permissions and the region permission needs to be on all the time, otherwise you may not be able to access the app properly or scan for nearby devices. In addition, to be able to use the map tagging feature properly in the future, you will also need to be connected to WIFI or cellular mobile data, otherwise Bing Maps will not load properly.<br><br>
