@@ -122,9 +122,4 @@ public class SelectDeviceRecycleViewAdapter extends RecyclerView.Adapter<SelectD
 
         }
     }
-
-
-
-
-
 }

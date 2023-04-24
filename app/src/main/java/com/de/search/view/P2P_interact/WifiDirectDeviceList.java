@@ -63,6 +63,8 @@ public class WifiDirectDeviceList extends BaseActivity {
 
 
     //p2p looks for a device callback
+    //An anonymous internal class called peerListListener is defined which implements the WifiP2pManager.PeerListListener interface.
+    //This listener is used to receive notifications when the list of Wi-Fi P2P devices changes.
     WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peersList) {

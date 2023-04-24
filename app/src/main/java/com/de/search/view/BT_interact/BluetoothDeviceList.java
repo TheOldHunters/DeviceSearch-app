@@ -1,5 +1,6 @@
 package com.de.search.view.BT_interact;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -8,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 
 import com.de.search.R;
 import com.de.search.base.BaseActivity;
@@ -49,6 +52,7 @@ public class BluetoothDeviceList extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             switch (action) {
+                //When a new Bluetooth device is found (BluetoothDevice.ACTION_FOUND), the device is added to the mNewDevicesArrayAdapter if it is not already paired.
                 case BluetoothDevice.ACTION_FOUND: {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
@@ -62,18 +66,27 @@ public class BluetoothDeviceList extends BaseActivity {
                     }
                     break;
                 }
+                //When the Bluetooth adapter has finished searching (BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+                //if no new devices are found, add a message to mNewDevicesArrayAdapter indicating that no devices were found.
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     if (mNewDevicesArrayAdapter.getCount() == 0) {
                         String noDevices = getResources().getText(R.string.none_found).toString();
                         mNewDevicesArrayAdapter.add(noDevices);
                     }
                     break;
+
+                //BluetoothDevice.ACTION_BOND_STATE_CHANGED: This event is triggered when the binding state of the device changes.
+                //The code handles three binding states:
+                //a. BluetoothDevice.BOND_BONDING: The device is pairing. A Toast is displayed to indicate that pairing is in progress.
+                //b. BluetoothDevice.BOND_BONDED: The device has been successfully paired. A dialog box is displayed to allow the user to enter a custom name for the device or to use the default name. Also saves the device information to FriendBean and updates the device list.
+                //c. BluetoothDevice.BOND_NONE: The device is not paired. A Toast is displayed to indicate that the device is not paired.
                 case BluetoothDevice.ACTION_BOND_STATE_CHANGED: {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     if (device.getBondState() == BluetoothDevice.BOND_BONDING) {
 
                         Toast.makeText(BluetoothDeviceList.this, "Pairing" + device.getName(), Toast.LENGTH_SHORT).show();
-                    } else if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+                    }
+                    else if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
 
                         if (alertDialog != null) {
                             return;
@@ -146,7 +159,8 @@ public class BluetoothDeviceList extends BaseActivity {
                         Toast.makeText(BluetoothDeviceList.this, "Complete pairing" + device.getName(), Toast.LENGTH_SHORT).show();
 
 
-                    } else if (device.getBondState() == BluetoothDevice.BOND_NONE) {
+                    }
+                    else if (device.getBondState() == BluetoothDevice.BOND_NONE) {
                         //Pairing failure
                         Toast.makeText(BluetoothDeviceList.this, "unpair" + device.getName(), Toast.LENGTH_SHORT).show();
 
@@ -174,7 +188,6 @@ public class BluetoothDeviceList extends BaseActivity {
 
     @Override
     protected void initData() {
-
         mPairedDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name);
         mNewDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name);
 
@@ -206,50 +219,74 @@ public class BluetoothDeviceList extends BaseActivity {
 
     @SuppressLint("MissingPermission")
     private void init() {
-        //List of paired Bluetooth devices
+        setupPairedDevicesListView();
+        setupNewDevicesListView();
+        registerBluetoothReceivers();
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        displayPairedDevices();
+    }
+    //Set the paired device list view.
+    private void setupPairedDevicesListView() {
         ListView pairedListView = findViewById(R.id.paired_devices);
         pairedListView.setAdapter(mPairedDevicesArrayAdapter);
         pairedListView.setOnItemClickListener(paireDeviceClickListener);
+    }
 
-
-        //List of unpaired Bluetooth devices
+    //Set the unpaired device list view.
+    private void setupNewDevicesListView() {
         ListView newDevicesListView = findViewById(R.id.new_devices);
         newDevicesListView.setAdapter(mNewDevicesArrayAdapter);
         newDevicesListView.setOnItemClickListener(newDeviceClickListener);
+    }
 
-
-        //Dynamically register broadcast receivers
+    //Register a Bluetooth radio receiver.
+    private void registerBluetoothReceivers() {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(broadcastReceiver, filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         registerReceiver(broadcastReceiver, filter);
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+    }
 
-
-        @SuppressLint("MissingPermission") Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+    //Displays a list of paired devices.
+    @SuppressLint("MissingPermission")
+    private void displayPairedDevices() {
+        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
             for (BluetoothDevice device : pairedDevices) {
-
-                List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "mac = ?", device.getAddress());
-                if (friendBeans.size() > 0) {
-                    if (friendBeans.get(0).getStatus() == 0) {
-                        mPairedDevicesArrayAdapter.add(friendBeans.get(0).getUserName() + "\n" + device.getAddress());
-                    } else {
-                        mPairedDevicesArrayAdapter.add(friendBeans.get(0).getUserName() + "(send)" + "\n" + device.getAddress());
-                    }
-
-                } else {
-                    mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                }
-
+                addDeviceToList(device);
             }
         } else {
             String noDevices = getResources().getText(R.string.none_paired).toString();
             mPairedDevicesArrayAdapter.add(noDevices);
         }
     }
+
+    //Add devices to the paired devices list based on device information
+    private void addDeviceToList(BluetoothDevice device) {
+        List<FriendBean> friendBeans = FriendBean.find(FriendBean.class, "mac = ?", device.getAddress());
+        if (friendBeans.size() > 0) {
+            if (friendBeans.get(0).getStatus() == 0) {
+                mPairedDevicesArrayAdapter.add(friendBeans.get(0).getUserName() + "\n" + device.getAddress());
+            } else {
+                mPairedDevicesArrayAdapter.add(friendBeans.get(0).getUserName() + "(send)" + "\n" + device.getAddress());
+            }
+        } else {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+        }
+    }
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -264,26 +301,44 @@ public class BluetoothDeviceList extends BaseActivity {
 
     private final AdapterView.OnItemClickListener paireDeviceClickListener = new AdapterView.OnItemClickListener() {
         @SuppressLint("MissingPermission")
-        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
+        public void onItemClick(AdapterView<?> av, View v, int position, long id) {
+            // Cancel Bluetooth discovery process
             mBtAdapter.cancelDiscovery();
+
+            // Get the device information string from the TextView
             String info = ((TextView) v).getText().toString();
-            String address = info.substring(info.length() - 17); //cut 17 characters, that's the mac address
+
+            // Extract the MAC address by taking the last 17 characters of the string
+            String address = info.substring(info.length() - 17);
+
+            // Create a new Intent and put the MAC address as an extra
             Intent intent = new Intent();
-            intent.putExtra(ADDRESS, address);  //Mac address
+            intent.putExtra(ADDRESS, address);
+
+            // Set the result and finish the activity
             setResult(Activity.RESULT_OK, intent);
             finish();
         }
+
     };
     private final AdapterView.OnItemClickListener newDeviceClickListener = new AdapterView.OnItemClickListener() {
         @SuppressLint("MissingPermission")
-        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
+        public void onItemClick(AdapterView<?> av, View v, int position, long id) {
+            // Cancel Bluetooth discovery process
             mBtAdapter.cancelDiscovery();
+
+            // Get the device information string from the TextView
             String info = ((TextView) v).getText().toString();
-            String address = info.substring(info.length() - 17); //cut 17 characters, that's the mac address
+
+            // Extract the MAC address by taking the last 17 characters of the string
+            String address = info.substring(info.length() - 17);
+
+            // Get the BluetoothDevice instance for the given MAC address
             BluetoothDevice bluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
 
+            // Initiate the pairing process with the selected Bluetooth device
             bluetoothDevice.createBond();
-
         }
+
     };
 }

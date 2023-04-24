@@ -3,7 +3,8 @@
 
 ##1. Software Introduction
 This app is a peer-to-peer single-hop communication application based on Bluetooth and WIFI direct implementation.It combines Bluetooth BLE and traditional Bluetooth scanning, RSSI ranging and many other features to achieve a more innovative Android anti-loss application<br><br>
-the `compileSdkVersion` and `targetSdkVersion` is 32 in this project. And projects can only be run when connected to a real phone, as Android Studio's virtual machine does not have Bluetooth or WIFI capabilities. In addition, the running phone Android version is `Android 12.`
+the `compileSdkVersion` and `targetSdkVersion` is 32 in this project. And projects can only be run when connected to a real phone, as Android Studio's virtual machine does not have Bluetooth or WIFI capabilities. In addition, the running phone Android version is `Android 12.`<br><br>
+In addition, each class is given very detailed comments, especially the core functional classes, which can be read in conjunction with my thesis to understand my project<br><br>
 ##2. Function Introduction
 This app is an item search and anti-lost app mainly based on Bluetooth and Wi-Fi direct technology. It can not only be used for simple item search, save, and locate functions, but also use peer-to-peer communication to connect different mobile phones in series.
 That is to say, you can connect another friend who has downloaded this app and transmit the device information you want to find to your friend through Bluetooth or Wi-Fi direct technology.

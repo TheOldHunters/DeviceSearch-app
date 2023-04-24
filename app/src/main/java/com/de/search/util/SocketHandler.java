@@ -62,11 +62,12 @@ public class SocketHandler {
 
     //Used to close socket and serverSocket connections.
     //It will call the closeP2p() method to close the P2P group before closing the connection.
-    public static synchronized void closeSocket(){
-
+    public static synchronized void closeSocket() {
+        // Close the P2P connection before closing the socket.
         closeP2p();
 
-        if (socket != null){
+        // Close the socket if it is not null.
+        if (socket != null) {
             try {
                 socket.close();
             } catch (IOException e) {
@@ -74,8 +75,9 @@ public class SocketHandler {
             }
         }
 
-        if (type == 0){
-            if (serverSocket != null){
+        // If the socket type is a server socket, close the server socket if it is not null.
+        if (type == 0) {
+            if (serverSocket != null) {
                 try {
                     serverSocket.close();
                 } catch (IOException e) {
@@ -84,26 +86,28 @@ public class SocketHandler {
             }
         }
 
+        // Set the socket and serverSocket objects to null.
         socket = null;
         serverSocket = null;
     }
 
-    public static synchronized void closeP2p(){
 
-        if (mManager != null && mChannel != null){
+    public static synchronized void closeP2p() {
+        // Check if mManager and mChannel are not null before attempting to remove the P2P group.
+        if (mManager != null && mChannel != null) {
+            // Call removeGroup() to remove the current P2P group.
             mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+                // If the group is successfully removed, log a success message.
                 public void onSuccess() {
                     Log.e("---", "remove group success");
-
                 }
+                // If the group removal fails, log an error message.
                 public void onFailure(int reason) {
                     Log.e("---" , "remove group fail");
-
                 }
             });
         }
-
-
     }
+
 }
 

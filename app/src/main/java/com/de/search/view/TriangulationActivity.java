@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
@@ -264,7 +265,7 @@ public class TriangulationActivity extends BaseActivity implements LocationDevic
 
     @Override
     public void onLongClick(int position) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        @SuppressLint("NotifyDataSetChanged") AlertDialog alertDialog = new AlertDialog.Builder(this)
                 //title
                 .setTitle("Delete device location")
                 //content

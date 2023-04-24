@@ -124,12 +124,9 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
     @Override
     protected void initListener() {
-        tvBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startToActivity(HomeActivity.class);
-                finish();
-            }
+        tvBack.setOnClickListener(view -> {
+            startToActivity(HomeActivity.class);
+            finish();
         });
     }
 
@@ -234,7 +231,7 @@ public class AddBtActivity extends BaseActivity implements AddDeviceRecycleViewA
 
             }
 
-            @SuppressLint("MissingPermission")
+            @SuppressLint({"MissingPermission", "NotifyDataSetChanged"})
             @Override
             public void onDeviceFounded(SearchResult device) {
                 BluetoothDevice bluetoothDevice = device.device;

@@ -483,6 +483,7 @@ public class BluetoothInteract extends BaseActivity {
     }
     // --------------------------------------Map related, using third-party bingMaps------------------------------------
 
+    //Adding devices (list of DeviceBean objects) to the map as visual pushpins (pins).
     private void addDevice(List<DeviceBean> deviceBeans){
         EntityLayer entityLayer = (EntityLayer) bingMapsView.getLayerManager()
                 .getLayerByName(Constants.DataLayers.Search);
@@ -533,13 +534,16 @@ public class BluetoothInteract extends BaseActivity {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
+                //when user click 'scan'
                 case R.id.scan:
                     Intent serverIntent = new Intent(BluetoothInteract.this, BluetoothDeviceList.class);
                     startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                     return true;
+                //when user click 'set discoverable'
                 case R.id.discoverable:
                     setVisble();
                     return true;
+                //when user click 'back'
                 case R.id.back:
                     startActivity(new Intent(BluetoothInteract.this, HomeActivity.class));
                     finish();

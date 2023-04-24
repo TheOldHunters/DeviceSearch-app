@@ -9,6 +9,7 @@ public class LocalStorageUtils {
 
     private static final String NAME = "data_info";
 
+    // Save a key-value pair to SharedPreferences.
     public static void setParam(Context context, String key, Object object) {
 
         String type = object.getClass().getSimpleName();
@@ -38,7 +39,7 @@ public class LocalStorageUtils {
         editor.commit();
     }
 
-
+    // Retrieve a value from SharedPreferences with a specified key. If the key does not exist, return the default value.
     public static Object getParam(Context context, String key, Object defaultObject) {
         String type = defaultObject.getClass().getSimpleName();
         SharedPreferences sp = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);

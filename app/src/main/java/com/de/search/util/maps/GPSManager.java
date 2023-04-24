@@ -20,6 +20,7 @@ public class GPSManager {
     private Activity _activity;
     private LocationListener _listener;
 
+    //Receives an Activity and a LocationListener object as parameters. It initialises a LocationManager object and a _bestProvider variable.
     public GPSManager(Activity activity, LocationListener listener) {
         _activity = activity;
         _listener = listener;
@@ -38,6 +39,7 @@ public class GPSManager {
         }
     }
 
+    //Gets the last known position from the device's GPS and returns its coordinates as a Coordinate object. If the position cannot be obtained, null is returned.
     public Coordinate GetCoordinate() {
         if (_bestProvider != null) {
             if (ActivityCompat.checkSelfPermission(_activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

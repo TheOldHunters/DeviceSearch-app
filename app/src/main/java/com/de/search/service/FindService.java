@@ -113,31 +113,28 @@ public class FindService extends Service {
 
     /**
      * The Service is called back each time it is started through the startService() method.
-     *
-     * @param intent
-     * @param flags
-     * @param startId
-     * @return
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Print a debug message to the console.
         System.out.println("onStartCommand invoke");
 
+        // Extract the name and MAC address from the intent extras.
         name = intent.getStringExtra("name");
         mac = intent.getStringExtra("mac");
 
-
+        // Create the music notification.
         createMusicNotification(this);
 
+        // Register a listener for Bluetooth state changes and start scanning if Bluetooth is already enabled.
         APP.mClient.registerBluetoothStateListener(mBluetoothStateListener);
-
         if (APP.mClient.isBluetoothOpened()) {
             scan();
         } else {
             APP.mClient.openBluetooth();
         }
 
-
+        // Call the super class's onStartCommand() method.
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -199,31 +196,31 @@ public class FindService extends Service {
                 if (find){
                     return;
                 }
-
                 BluetoothDevice bluetoothDevice = device.device;
                 if (TextUtils.isEmpty(bluetoothDevice.getName()) || bluetoothDevice.getName().equals("NULL") || device.rssi == 0 || TextUtils.isEmpty(bluetoothDevice.getAddress())) {   //Add it to the list
                     return;
                 }
-
                 if (bluetoothDevice.getAddress().equals(mac)) {
                     float d = 0;
 
                     switch (APP.algorithm){
                         case 0:
-                            d = RssiAlgorithm.calculateDistance1(device.rssi);
+                            d = RssiAlgorithm.calculateDistance1(device.rssi); //Basic RSSI
                             break;
                         case 1:
-                            d = RssiAlgorithm.calculateDistance2(device.rssi);
+                            d = RssiAlgorithm.calculateDistance2(device.rssi);//Kalman
                             break;
                         case 2:
-                            d = RssiAlgorithm.calculateDistance3(device.rssi);
+                            d = RssiAlgorithm.calculateDistance3(device.rssi);//Recursive Moving Average Filter
                             break;
                     }
+                    // Round the distance value to three decimal places.
                     DecimalFormat df = new DecimalFormat("0.000"); //Accurate to three decimal places
                     d = Float.parseFloat(df.format(d));
 
                     APP.location = APP.getLastKnownLocation();
 
+                    // Check if the distance to the device is within the set range and send a notification.
                     if (APP.getDistance() >= d){
                         sendData1(String.valueOf(d), String.valueOf(device.rssi), "detected");
                         //Vibrations
@@ -231,9 +228,8 @@ public class FindService extends Service {
                         sendData1(String.valueOf(d), String.valueOf(device.rssi), "not detected");
                     }
 
-
+                    // Set the find flag to true and log the result.
                     find = true;
-
                     Log.e("", "find it");
                     Log.e("getRssi", String.valueOf(device.rssi)); //record rssi value
                 }
@@ -264,53 +260,65 @@ public class FindService extends Service {
 
 
     private void sendData1(String distance, String rssi, String status) {
-
+        // Check if it is currently in the process of finding, if not, exit the method.
         if (!APP.isFind) {
             return;
         }
 
-        if (!TextUtils.isEmpty(distance) && APP.distance >= Float.parseFloat(distance)){
-            if (APP.isOpenVibrator()){
-                vibrator.vibrate(pattern, -1, audioAttributes);
-            }
+        // Convert the distance string to a floating-point value.
+        float distanceValue = TextUtils.isEmpty(distance) ? 0f : Float.parseFloat(distance);
 
+        // Check if the current distance is less than or equal to the set distance value, and whether the vibrator is enabled.
+        boolean shouldNotify = !TextUtils.isEmpty(distance) && APP.distance >= distanceValue && APP.isOpenVibrator();
+
+        // If the distance is less than or equal to the set distance value, and the vibrator is enabled, vibrate.
+        if (shouldNotify) {
+            vibrator.vibrate(pattern, -1, audioAttributes);
         }
 
-//        if (status.equals("detected")) {
-//            APP.location = APP.getLastKnownLocation();
-//        }
-
-        if (!TextUtils.isEmpty(distance))
+        // Update the distance, rssi, and status TextViews in the notification RemoteViews if they are not empty.
+        if (!TextUtils.isEmpty(distance)) {
             remoteViews.setTextViewText(R.id.tv_distance, "distance(m)：" + distance);
-        if (!TextUtils.isEmpty(rssi))
+        }
+        if (!TextUtils.isEmpty(rssi)) {
             remoteViews.setTextViewText(R.id.tv_rssi, "rssi：" + rssi);
-        if (!TextUtils.isEmpty(status))
+        }
+        if (!TextUtils.isEmpty(status)) {
             remoteViews.setTextViewText(R.id.tv_status, "status：" + status);
+        }
+
+        // Show the notification using the NotificationManager.
         notificationManager.notify(0x11, notification);
 
-        Intent intentBroadcastReceiver = new Intent();
-        intentBroadcastReceiver.setAction(FindActivity.ACTION_SERVICE_NEED);
-        intentBroadcastReceiver.putExtra("distance", distance);
-        intentBroadcastReceiver.putExtra("rssi", rssi);
-        intentBroadcastReceiver.putExtra("status", status);
+        // Create an intent for the FindActivity.ACTION_SERVICE_NEED action and add distance, rssi, and status extras to the intent.
+        Intent intent = new Intent(FindActivity.ACTION_SERVICE_NEED);
+        intent.putExtra("distance", distance);
+        intent.putExtra("rssi", rssi);
+        intent.putExtra("status", status);
 
-        sendBroadcast(intentBroadcastReceiver);
+        // Send the broadcast using the intent.
+        sendBroadcast(intent);
     }
 
-    private void sendData2(String num) {
 
+    private void sendData2(String num) {
+        // Check if it is currently in the process of finding, if not, exit the method.
         if (!APP.isFind) {
             return;
         }
 
+        // Update the number of scans TextView in the notification RemoteViews.
         remoteViews.setTextViewText(R.id.tv_num, "scan times：" + num);
+
+        // Show the notification using the NotificationManager.
         notificationManager.notify(0x11, notification);
 
-        Intent intentBroadcastReceiver = new Intent();
-        intentBroadcastReceiver.setAction(FindActivity.ACTION_SERVICE_NEED);
-        intentBroadcastReceiver.putExtra("num", num);
+        // Create an intent for the FindActivity.ACTION_SERVICE_NEED action and add num extra to the intent.
+        Intent intent = new Intent(FindActivity.ACTION_SERVICE_NEED);
+        intent.putExtra("num", num);
 
-        sendBroadcast(intentBroadcastReceiver);
+        // Send the broadcast using the intent.
+        sendBroadcast(intent);
     }
 
     // Create notification bar
